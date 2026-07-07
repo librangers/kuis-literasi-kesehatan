@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<title>Kuis Literasi Kesehatan</title>
+<style>
+  :root{
+    color-scheme:light;
+    --text:#0F2E2B; --text2:#5B7A76; --canvas:#EAF7F5; --card:#FFFFFF; --soft:#F4FBFA;
+    --surface2:#E2F1EF; --border:#CDE8E4;
+    --teal:#0D9488; --teal-deep:#0F766E; --cyan:#06B6D4;
+    --grad:linear-gradient(135deg,#0EA5B7 0%,#12B981 100%);
+    --grad-soft:linear-gradient(135deg,#E4F7FB 0%,#E6F7EF 100%);
+    --blue:#0D9488; --blue-soft:#D6F0ED;
+    --green:#12B981; --green-soft:#DCF6EA; --red:#EF5B52; --red-soft:#FDE7E5;
+    --orange:#F59E0B; --orange-soft:#FEF1DA;
+    --radius:16px; --shadow:0 1px 2px rgba(13,80,74,.06),0 10px 30px rgba(13,80,74,.08);
+    --shadow-lg:0 12px 40px rgba(13,80,74,.16);
+  }
+  @media (prefers-color-scheme: dark) and (min-width:999999px){
+    :root{
+      --text:#F1FDFB; --text2:rgba(226,248,244,.86); --canvas:#08201E; --card:#0F2A27; --soft:#123330;
+      --surface2:#1E443F; --border:rgba(130,225,210,.30);
+      --teal:#2DD4BF; --teal-deep:#14B8A6; --cyan:#22D3EE;
+      --grad:linear-gradient(135deg,#0E7490 0%,#0F766E 100%);
+      --grad-soft:linear-gradient(135deg,#123b40 0%,#123330 100%);
+      --blue:#2DD4BF; --blue-soft:rgba(45,212,191,.14);
+      --green:#34D399; --green-soft:rgba(52,211,153,.15); --red:#F0776D; --red-soft:rgba(240,119,109,.15);
+      --orange:#FBBF24; --orange-soft:rgba(251,191,36,.15);
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+      --shadow-lg:0 12px 40px rgba(0,0,0,.5);
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--canvas);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  body{background-image:radial-gradient(1200px 500px at 100% -5%,rgba(6,182,212,.12),transparent 60%),radial-gradient(1000px 500px at -10% 0%,rgba(18,185,129,.12),transparent 55%);background-attachment:fixed}
+  .wrap{max-width:780px;margin:0 auto;padding:22px 20px 52px}
+  .hidden{display:none!important}
+  /* Hero */
+  .hero{position:relative;overflow:hidden;background:var(--grad);border-radius:22px;padding:30px 26px;color:#fff;
+    box-shadow:var(--shadow-lg);margin-bottom:22px}
+  .hero::after{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;
+    background:rgba(255,255,255,.14)}
+  .hero::before{content:'';position:absolute;right:60px;bottom:-70px;width:150px;height:150px;border-radius:50%;
+    background:rgba(255,255,255,.10)}
+  .hero .badge-lit{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.22);color:#fff;
+    font-size:.8rem;font-weight:700;padding:6px 13px;border-radius:999px;margin-bottom:14px;backdrop-filter:blur(4px)}
+  .hero h1{font-size:2rem;line-height:1.15;letter-spacing:-.02em;position:relative}
+  .hero .lead{color:rgba(255,255,255,.92);margin-top:10px;font-size:1rem;position:relative;max-width:60ch}
+  .hero .stats{display:flex;gap:22px;margin-top:18px;position:relative;flex-wrap:wrap}
+  .hero .stat b{display:block;font-size:1.35rem;line-height:1}
+  .hero .stat span{font-size:.78rem;color:rgba(255,255,255,.85)}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+  .section-label{font-size:.8rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--teal-deep);margin:8px 0 14px;display:flex;align-items:center;gap:8px}
+  .section-label::before{content:'';width:18px;height:3px;border-radius:3px;background:var(--grad)}
+  .topics{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .topic{position:relative;display:flex;flex-direction:column;align-items:stretch;text-align:left;background:var(--card);
+    border:1px solid var(--border);border-radius:var(--radius);padding:0;cursor:pointer;
+    transition:border-color .18s,transform .12s,box-shadow .18s;min-height:44px;overflow:hidden}
+  .topic:hover{border-color:transparent;box-shadow:var(--shadow-lg);transform:translateY(-3px)}
+  .topic:active{transform:translateY(-1px)}
+  .topic:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+  .topic .t-ico{width:46px;height:46px;border-radius:14px;background:var(--grad-soft);display:flex;
+    align-items:center;justify-content:center;font-size:1.55rem;box-shadow:inset 0 0 0 1px var(--border)}
+  .topic .t-illus{position:relative;width:100%;height:98px;display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center;overflow:hidden}
+  .topic .t-svg{width:132px;height:92px;display:block;transition:transform .25s;filter:drop-shadow(0 2px 4px rgba(0,0,0,.14))}
+  .topic:hover .t-svg{transform:scale(1.06)}
+  .topic .t-num{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.92);color:var(--teal-deep);font-size:.62rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:4px 10px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,.14)}
+  .topic .t-body{display:flex;flex-direction:column;gap:6px;padding:14px 16px 16px;flex:1}
+  .topic .t-name{font-weight:800;font-size:1.02rem;line-height:1.28;color:var(--text)}
+  .topic .t-meta{font-size:.8rem;color:var(--text2);display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:auto}
+  .topic .hs{color:var(--orange);font-weight:700}
+  .topic.mix{grid-column:1/-1;background:var(--grad);border-color:transparent;flex-direction:row;padding:18px;
+    align-items:center;gap:16px;color:#fff;box-shadow:var(--shadow)}
+  .topic.mix::before{display:none}
+  .topic.mix:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+  .topic.mix .t-ico{background:rgba(255,255,255,.22);box-shadow:none;font-size:1.7rem;color:#fff}
+  .topic.mix .t-name{color:#fff;font-size:1.1rem}
+  .topic.mix .t-meta{color:rgba(255,255,255,.9);margin-top:2px}
+  .topic.mix .hs{color:#fff}
+  /* Quiz */
+  .qtop{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .btn-link{background:none;border:none;color:var(--text2);font-size:.9rem;cursor:pointer;padding:8px 10px;border-radius:10px;font-weight:600}
+  .btn-link:hover{color:var(--teal-deep);background:var(--surface2)}
+  .counter{font-size:.9rem;color:var(--text2);font-weight:600}
+  .counter b{color:var(--teal-deep)}
+  .pbar{height:10px;background:var(--surface2);border-radius:999px;overflow:hidden;margin-bottom:20px}
+  .pbar>span{display:block;height:100%;background:var(--grad);border-radius:999px;transition:width .35s ease}
+  .src{display:inline-flex;align-items:center;gap:7px;font-size:.78rem;font-weight:600;color:var(--teal-deep);
+    background:var(--blue-soft);padding:5px 12px;border-radius:999px;margin-bottom:16px}
+  .qtext{font-size:1.25rem;font-weight:700;line-height:1.4;margin-bottom:20px;letter-spacing:-.01em}
+  .opts{display:flex;flex-direction:column;gap:11px}
+  .opt{display:flex;align-items:flex-start;gap:13px;width:100%;text-align:left;background:var(--soft);
+    border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;font-size:1rem;
+    color:var(--text);transition:border-color .14s,background .14s,transform .06s;min-height:44px}
+  .opt:hover:not(:disabled){border-color:var(--teal);background:var(--card)}
+  .opt:active:not(:disabled){transform:scale(.995)}
+  .opt:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+  .opt .lt{flex:none;width:28px;height:28px;border-radius:9px;background:var(--surface2);color:var(--teal-deep);
+    font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center}
+  .opt .ot{padding-top:3px}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.correct .lt{background:var(--green);color:#fff}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+  .opt.wrong .lt{background:var(--red);color:#fff}
+  .opt.dim{opacity:.55}
+  .opt:disabled{cursor:default}
+  .fb{margin-top:16px;border-radius:12px;padding:15px 16px;font-size:.95rem;line-height:1.55;border:1px solid}
+  .fb.ok{background:var(--green-soft);border-color:var(--green)}
+  .fb.no{background:var(--red-soft);border-color:var(--red)}
+  .fb .fb-h{font-weight:800;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .fb.ok .fb-h{color:var(--green)}
+  .fb.no .fb-h{color:var(--red)}
+  .fb .exp{color:var(--text)}
+  .actions{display:flex;justify-content:flex-end;margin-top:20px}
+  .btn{background:var(--grad);color:#fff;border:none;border-radius:12px;padding:13px 26px;font-size:1rem;
+    font-weight:700;cursor:pointer;min-height:44px;transition:opacity .12s,transform .06s,box-shadow .15s;
+    box-shadow:0 6px 16px rgba(13,148,136,.28)}
+  .btn:hover{opacity:.95;transform:translateY(-1px);box-shadow:0 8px 20px rgba(13,148,136,.34)}
+  .btn:active{transform:translateY(0)}
+  .btn:disabled{opacity:.35;cursor:not-allowed;box-shadow:none;transform:none}
+  .btn.ghost{background:var(--surface2);color:var(--teal-deep);box-shadow:none}
+  .btn.ghost:hover{background:var(--border)}
+  /* Result */
+  .result{text-align:center}
+  .score-ring{width:160px;height:160px;margin:8px auto 4px;position:relative}
+  .score-ring svg{transform:rotate(-90deg)}
+  .score-ring .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .score-ring .num b{font-size:2.6rem;line-height:1}
+  .score-ring .num span{font-size:.85rem;color:var(--text2)}
+  .verdict{font-size:1.35rem;font-weight:800;margin-top:10px;letter-spacing:-.01em}
+  .rmeta{color:var(--text2);margin-top:8px}
+  .rmeta .newhs{color:var(--orange);font-weight:700}
+  .rbtns{display:flex;gap:12px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+  .foot{text-align:center;color:var(--text2);font-size:.8rem;margin-top:26px}
+  @media(max-width:480px){
+    .topics{grid-template-columns:1fr}
+    .hero{padding:24px 20px}
+    .hero h1{font-size:1.6rem}
+    .wrap{padding:18px 15px 40px}
+  }
+
+  /* Branded header */
+  .appbar{display:flex;align-items:center;flex-wrap:wrap;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px;margin-bottom:16px;box-shadow:var(--shadow)}
+  .appbar .brand-prog{margin-left:auto;display:flex;align-items:center;gap:10px;background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:7px 14px}
+  .appbar .bp-ico{font-size:1.2rem;line-height:1}
+  .appbar .bp-txt{display:flex;flex-direction:column;line-height:1.16}
+  .appbar .bp-k{font-size:.58rem;font-weight:800;letter-spacing:.15em;color:var(--text2)}
+  .appbar .bp-v{font-size:.9rem;font-weight:800;color:var(--teal-deep)}
+  @media(max-width:480px){.appbar .brand-prog{margin-left:0;width:100%;justify-content:center}}
+  .appbar .brand-logo{height:46px;width:auto;display:block;border-radius:8px}
+  .appbar .brand-div{width:1px;align-self:stretch;background:var(--border);margin:2px 0}
+  .appbar .brand-txt{display:flex;flex-direction:column;line-height:1.18}
+  .appbar .brand-kicker{font-size:.66rem;font-weight:800;letter-spacing:.18em;color:var(--teal-deep)}
+  .appbar .brand-title{font-size:.98rem;font-weight:800;letter-spacing:.04em;color:var(--text)}
+  @media(max-width:480px){.appbar{padding:10px 13px;gap:11px}.appbar .brand-logo{height:36px}.appbar .brand-title{font-size:.82rem}.appbar .brand-kicker{font-size:.6rem;letter-spacing:.14em}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="appbar">
+    <img class="brand-logo" src="data:image/png;base64,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" alt="Libme Library Academy">
+    <div class="brand-div"></div>
+    <div class="brand-txt">
+      <span class="brand-kicker">MICROCREDENTIAL</span>
+      <span class="brand-title">LIBRARY ACADEMY</span>
+    </div>
+    <div class="brand-prog">
+      <span class="bp-ico">🩺</span>
+      <div class="bp-txt">
+        <span class="bp-k">PEMBELAJARAN</span>
+        <span class="bp-v">Literasi Kesehatan</span>
+      </div>
+    </div>
+  </header>
+  <section id="home">
+    <div class="hero">
+      <div class="badge-lit">🩺 Literasi Kesehatan</div>
+      <h1>Kuis Literasi Kesehatan</h1>
+      <p class="lead">Pilih satu topik atau mode <b>Campuran</b>, lalu kerjakan <b>10 soal acak</b>. Jawaban langsung dinilai lengkap dengan penjelasan, dan skor tertinggi tersimpan di perangkat ini.</p>
+      <div class="stats">
+        <div class="stat"><b>8</b><span>Topik</span></div>
+        <div class="stat"><b>10</b><span>Soal / Sesi</span></div>
+      </div>
+    </div>
+    <div class="section-label">Pilih mode atau topik untuk memulai</div>
+    <div class="topics" id="topicGrid"></div>
+    <p class="foot">Setiap sesi menampilkan 10 soal acak dengan posisi jawaban benar yang diacak.</p>
+  </section>
+  <section id="quiz" class="hidden">
+    <div class="qtop">
+      <button class="btn-link" id="quitBtn">← Ganti topik</button>
+      <div class="counter">Soal <b id="qNum">1</b>/10 · Skor <b id="qScore">0</b></div>
+    </div>
+    <div class="pbar"><span id="pfill" style="width:0%"></span></div>
+    <div class="card">
+      <div class="src" id="qSrc">📘 <span></span></div>
+      <div class="qtext" id="qText"></div>
+      <div class="opts" id="optBox"></div>
+      <div class="fb hidden" id="fbBox"></div>
+      <div class="actions"><button class="btn" id="nextBtn" disabled>Lanjut</button></div>
+    </div>
+  </section>
+  <section id="result" class="hidden">
+    <div class="card result">
+      <div class="src" id="rSrc" style="margin:0 auto 10px">📘 <span></span></div>
+      <div class="score-ring">
+        <svg width="160" height="160" viewBox="0 0 150 150">
+          <circle cx="75" cy="75" r="66" fill="none" stroke="var(--surface2)" stroke-width="12"/>
+          <circle id="ringFill" cx="75" cy="75" r="66" fill="none" stroke="var(--teal)" stroke-width="12"
+            stroke-linecap="round" stroke-dasharray="414.7" stroke-dashoffset="414.7" style="transition:stroke-dashoffset .8s ease"/>
+        </svg>
+        <div class="num"><b id="rScore">0</b><span>dari 10</span></div>
+      </div>
+      <div class="verdict" id="rVerdict"></div>
+      <div class="rmeta" id="rMeta"></div>
+      <div class="rbtns">
+        <button class="btn" id="againBtn">🔁 Ulang &amp; acak lagi</button>
+        <button class="btn ghost" id="homeBtn">Pilih topik lain</button>
+      </div>
+    </div>
+  </section>
+</div>
+<script>
+const BANK = {
+pengantar: {name:'Pengantar Literasi Kesehatan', short:'Pengantar', icon:'🧠', q:[
+{q:'Apa pengertian literasi kesehatan yang paling tepat?', c:'Kemampuan memperoleh, memahami, menilai, dan menggunakan informasi kesehatan untuk mengambil keputusan yang tepat', w:['Kemampuan menghafal seluruh istilah medis', 'Kemampuan menjadi dokter tanpa sekolah', 'Kemampuan membeli obat sebanyak-banyaknya'], e:'Literasi kesehatan menekankan memperoleh, memahami, menilai, dan menggunakan informasi untuk keputusan sehat, bukan menghafal istilah.'},
+{q:'Menurut Nutbeam, ada berapa tingkatan literasi kesehatan?', c:'3 tingkatan', w:['2 tingkatan', '4 tingkatan', '5 tingkatan'], e:'Nutbeam membagi literasi kesehatan menjadi tiga tingkatan: fungsional, interaktif, dan kritis.'},
+{q:'Tingkatan literasi kesehatan fungsional berkaitan dengan...', c:'Kemampuan dasar membaca dan memahami informasi kesehatan sederhana', w:['Kemampuan menganalisis kebijakan kesehatan nasional', 'Kemampuan melakukan operasi medis', 'Kemampuan membuat vaksin'], e:'Literasi fungsional adalah keterampilan dasar membaca untuk memahami informasi kesehatan sehari-hari, seperti aturan pakai obat.'},
+{q:'Literasi kesehatan interaktif ditandai dengan kemampuan...', c:'Menggali informasi secara aktif dan menerapkannya dalam situasi yang berubah', w:['Sekadar membaca label obat', 'Menolak semua saran tenaga kesehatan', 'Menghafal nama penyakit'], e:'Literasi interaktif melibatkan keterampilan aktif mencari, berinteraksi, dan menerapkan informasi dalam kondisi berbeda.'},
+{q:'Literasi kesehatan kritis adalah kemampuan...', c:'Menganalisis informasi secara kritis dan menggunakannya untuk mengendalikan situasi kesehatan', w:['Mengabaikan informasi baru', 'Percaya semua yang ada di media sosial', 'Hanya membaca judul berita'], e:'Literasi kritis adalah tingkat tertinggi: menganalisis informasi secara kritis untuk mengambil kendali atas kesehatan.'},
+{q:'Salah satu manfaat literasi kesehatan yang baik adalah...', c:'Mampu mengambil keputusan kesehatan yang tepat untuk diri dan keluarga', w:['Menghabiskan lebih banyak uang untuk obat', 'Lebih mudah tertipu hoaks', 'Menghindari pemeriksaan kesehatan'], e:'Literasi kesehatan yang baik membantu keputusan tepat dan mengurangi risiko salah informasi.'},
+{q:'Contoh penerapan literasi kesehatan dalam kehidupan sehari-hari adalah...', c:'Membaca dan memahami aturan pakai pada kemasan obat sebelum meminumnya', w:['Meminum obat tanpa membaca dosis', 'Membuang label kemasan obat', 'Mengikuti saran acak dari media sosial'], e:'Membaca aturan pakai obat adalah contoh literasi kesehatan fungsional yang mencegah kesalahan dosis.'},
+{q:'Mengapa literasi kesehatan penting bagi masyarakat?', c:'Karena membantu mencegah penyakit dan meningkatkan kualitas hidup', w:['Karena membuat orang takut ke dokter', 'Karena meningkatkan penjualan obat', 'Karena tidak ada gunanya'], e:'Dengan literasi kesehatan, masyarakat lebih mampu mencegah penyakit dan menjaga kualitas hidup.'},
+{q:'Orang dengan literasi kesehatan rendah cenderung...', c:'Lebih sulit memahami informasi kesehatan dan berisiko salah mengambil keputusan', w:['Selalu sehat sepanjang waktu', 'Lebih pandai memilih pengobatan', 'Kebal terhadap hoaks kesehatan'], e:'Literasi kesehatan rendah meningkatkan risiko salah paham dan keputusan yang keliru.'},
+{q:'Berikut yang termasuk sumber informasi kesehatan yang tepercaya adalah...', c:'Tenaga kesehatan dan situs resmi kementerian kesehatan', w:['Pesan berantai di grup chat', 'Iklan obat yang berlebihan', 'Unggahan anonim tanpa sumber'], e:'Sumber tepercaya berasal dari tenaga kesehatan dan lembaga resmi, bukan pesan berantai atau iklan.'},
+{q:'Literasi kesehatan tidak hanya soal membaca, tetapi juga...', c:'Memahami dan menggunakan informasi untuk bertindak sehat', w:['Menghafal seluruh isi buku kedokteran', 'Mengoleksi banyak obat', 'Menghindari tenaga kesehatan'], e:'Inti literasi kesehatan adalah penggunaan informasi untuk tindakan sehat, bukan sekadar membaca.'},
+{q:'Kemampuan menilai apakah sebuah informasi kesehatan benar atau menyesatkan termasuk tingkat literasi...', c:'Kritis', w:['Fungsional', 'Dasar', 'Pasif'], e:'Menilai kebenaran dan bias informasi adalah ciri literasi kesehatan kritis.'},
+{q:'Seseorang yang bisa membaca resep dokter namun sulit menerapkannya berada pada tingkat literasi...', c:'Fungsional', w:['Kritis', 'Interaktif', 'Analitis'], e:'Membaca informasi dasar tanpa penerapan lanjutan menandai literasi fungsional.'},
+{q:'Salah satu masalah sehari-hari akibat rendahnya literasi kesehatan adalah...', c:'Salah menggunakan dosis obat', w:['Terlalu sering berolahraga', 'Terlalu banyak makan sayur', 'Rajin memeriksakan diri'], e:'Rendahnya literasi kesehatan sering menyebabkan kesalahan dosis atau penggunaan obat.'},
+{q:'Literasi kesehatan yang baik membuat seseorang lebih ... terhadap informasi yang salah.', c:'Kritis dan waspada', w:['Mudah percaya', 'Acuh tak acuh', 'Panik berlebihan'], e:'Literasi kesehatan meningkatkan kewaspadaan dan sikap kritis terhadap misinformasi.'},
+{q:'Tujuan utama meningkatkan literasi kesehatan masyarakat adalah...', c:'Mendorong perilaku hidup sehat dan keputusan kesehatan yang tepat', w:['Menambah jumlah rumah sakit', 'Menaikkan harga obat', 'Mengurangi jumlah dokter'], e:'Peningkatan literasi kesehatan bertujuan mendorong perilaku dan keputusan sehat.'},
+{q:'Contoh literasi kesehatan interaktif adalah...', c:'Bertanya kepada tenaga kesehatan lalu menyesuaikan gaya hidup sesuai saran', w:['Membaca label tanpa bertindak', 'Mengabaikan anjuran dokter', 'Menyalin resep orang lain'], e:'Interaksi aktif dengan sumber informasi dan penerapannya menandai literasi interaktif.'},
+{q:'Media yang tepat untuk mencari informasi kesehatan yang akurat adalah...', c:'Situs resmi lembaga kesehatan dan konsultasi tenaga medis', w:['Rumor dari tetangga', 'Komentar acak di media sosial', 'Iklan tanpa sumber jelas'], e:'Informasi akurat berasal dari lembaga resmi dan tenaga medis.'},
+{q:'Literasi kesehatan berkaitan erat dengan kemampuan mengambil...', c:'Keputusan yang tepat terkait kesehatan', w:['Keuntungan finansial', 'Jabatan tinggi', 'Popularitas di media sosial'], e:'Literasi kesehatan berfokus pada keputusan kesehatan yang tepat.'},
+{q:'Manakah pernyataan yang benar tentang literasi kesehatan?', c:'Literasi kesehatan dapat ditingkatkan melalui pendidikan dan kebiasaan mencari informasi yang benar', w:['Literasi kesehatan bersifat tetap sejak lahir', 'Hanya dokter yang perlu literasi kesehatan', 'Literasi kesehatan tidak memengaruhi kesehatan'], e:'Literasi kesehatan dapat dilatih dan ditingkatkan serta relevan bagi semua orang.'},
+{q:'Ketika menerima informasi kesehatan baru, langkah bijak adalah...', c:'Memeriksa sumber dan kebenarannya sebelum mempercayai', w:['Langsung membagikannya ke semua orang', 'Mempercayainya tanpa memeriksa', 'Mengabaikan sepenuhnya'], e:'Memeriksa sumber sebelum percaya atau menyebarkan adalah sikap literasi kesehatan yang baik.'},
+{q:'Dampak positif literasi kesehatan bagi keluarga adalah...', c:'Anggota keluarga lebih mampu menjaga kesehatan bersama', w:['Anggota keluarga sering sakit', 'Biaya kesehatan makin membengkak', 'Keluarga menghindari layanan kesehatan'], e:'Literasi kesehatan yang baik membantu keluarga menjaga kesehatan bersama.'},
+{q:'Yang termasuk keterampilan literasi kesehatan adalah...', c:'Memahami, menilai, dan menggunakan informasi kesehatan', w:['Menghafal nomor telepon rumah sakit', 'Mengoleksi resep dokter', 'Menonton iklan obat'], e:'Keterampilan literasi kesehatan mencakup memahami, menilai, dan menggunakan informasi.'},
+{q:'Literasi kesehatan membantu seseorang mengenali kapan harus...', c:'Mencari bantuan tenaga kesehatan', w:['Mengabaikan gejala serius', 'Mengobati sendiri semua penyakit', 'Menunda semua pemeriksaan'], e:'Literasi kesehatan membantu mengenali kapan perlu mencari bantuan profesional.'},
+{q:'Salah satu ciri orang dengan literasi kesehatan tinggi adalah...', c:'Mau mengecek ulang kebenaran informasi kesehatan dari sumber tepercaya', w:['Mudah termakan hoaks', 'Malas mencari tahu', 'Menolak semua informasi baru'], e:'Kebiasaan verifikasi informasi mencerminkan literasi kesehatan tinggi.'},
+{q:'Literasi kesehatan yang rendah dapat menyebabkan penyebaran...', c:'Informasi kesehatan yang salah atau hoaks', w:['Kebiasaan hidup sehat', 'Pengetahuan medis yang benar', 'Kesadaran gizi seimbang'], e:'Rendahnya literasi kesehatan memudahkan penyebaran hoaks kesehatan.'},
+{q:'Pendekatan terbaik saat membaca berita kesehatan yang sensasional adalah...', c:'Tetap tenang dan memverifikasi ke sumber resmi', w:['Langsung panik dan menyebarkan', 'Mempercayai judulnya saja', 'Membeli produk yang diiklankan'], e:'Verifikasi ke sumber resmi mencegah keputusan salah akibat berita sensasional.'},
+{q:'Literasi kesehatan mendukung tercapainya...', c:'Masyarakat yang lebih sehat dan mandiri dalam menjaga kesehatan', w:['Ketergantungan penuh pada obat', 'Ketakutan terhadap dokter', 'Meningkatnya penyakit'], e:'Tujuan akhir literasi kesehatan adalah masyarakat yang sehat dan mandiri.'},
+{q:'Contoh keputusan yang didukung literasi kesehatan yang baik adalah...', c:'Memilih makanan bergizi berdasarkan informasi yang benar', w:['Mengikuti diet ekstrem tanpa dasar', 'Melewatkan imunisasi karena hoaks', 'Berhenti minum obat tanpa konsultasi'], e:'Keputusan berbasis informasi benar, seperti memilih makanan bergizi, mencerminkan literasi kesehatan.'},
+{q:'Kesimpulan yang tepat tentang literasi kesehatan adalah...', c:'Keterampilan penting yang membantu setiap orang menjaga kesehatannya sepanjang hidup', w:['Hanya penting bagi tenaga medis', 'Tidak relevan di era digital', 'Cukup dimiliki saat sakit saja'], e:'Literasi kesehatan adalah keterampilan hidup penting bagi semua orang sepanjang waktu.'}
+]},
+phbs: {name:'Pola Hidup Bersih dan Sehat (PHBS)', short:'PHBS', icon:'🧼', q:[
+{q:'PHBS adalah singkatan dari...', c:'Pola Hidup Bersih dan Sehat', w:['Pola Hidup Bahagia dan Santai', 'Perilaku Hidup Boros dan Sehat', 'Program Hidup Bersih Sekolah'], e:'PHBS adalah Pola Hidup Bersih dan Sehat, sekumpulan perilaku untuk menjaga kesehatan.'},
+{q:'Berapa langkah mencuci tangan yang benar menurut WHO?', c:'6 langkah', w:['3 langkah', '4 langkah', '8 langkah'], e:'WHO menganjurkan 6 langkah mencuci tangan pakai sabun.'},
+{q:'Waktu mencuci tangan pakai sabun yang dianjurkan adalah...', c:'Sekitar 20 sampai 40 detik', w:['2 detik', '5 menit', 'Tidak ada waktu khusus'], e:'Mencuci tangan yang efektif berlangsung sekitar 20 sampai 40 detik dengan sabun.'},
+{q:'Kapan waktu yang tepat untuk mencuci tangan?', c:'Sebelum makan dan setelah dari toilet', w:['Hanya saat tangan terlihat kotor', 'Hanya sekali sehari', 'Setelah tidur saja'], e:'Mencuci tangan penting sebelum makan, setelah toilet, dan setelah beraktivitas.'},
+{q:'Langkah pertama mencuci tangan menurut WHO adalah...', c:'Membasahi tangan dan menggosok kedua telapak tangan', w:['Mengeringkan tangan dengan tisu', 'Menggosok kuku terlebih dahulu', 'Membersihkan sela jari terlebih dahulu'], e:'Langkah awal adalah membasahi tangan dan menggosok kedua telapak dengan sabun.'},
+{q:'Mengapa mencuci tangan pakai sabun itu penting?', c:'Untuk membunuh dan mengangkat kuman penyebab penyakit', w:['Agar tangan wangi saja', 'Supaya kulit menjadi putih', 'Agar tidak perlu mandi'], e:'Sabun membantu mengangkat dan membunuh kuman yang bisa menyebabkan penyakit.'},
+{q:'3M Plus dalam pencegahan demam berdarah meliputi...', c:'Menguras, Menutup, dan Mendaur ulang barang bekas', w:['Makan, Mandi, Menyapu', 'Mencuci, Menjemur, Melipat', 'Menyiram, Memupuk, Memanen'], e:'3M Plus adalah Menguras tempat air, Menutup penampungan air, dan Mendaur ulang barang bekas, plus tindakan tambahan.'},
+{q:'Tujuan utama gerakan 3M Plus adalah...', c:'Memberantas sarang nyamuk penyebab demam berdarah', w:['Membersihkan halaman dari daun', 'Menghemat air', 'Mengecat rumah'], e:'3M Plus bertujuan memberantas tempat berkembang biak nyamuk Aedes aegypti.'},
+{q:'Salah satu contoh menjaga kebersihan makanan adalah...', c:'Mencuci bahan makanan dan memasaknya hingga matang', w:['Membiarkan makanan terbuka', 'Menggunakan air kotor untuk mencuci', 'Menyimpan makanan yang sudah basi'], e:'Kebersihan makanan mencakup mencuci bahan dan memasak hingga matang untuk membunuh kuman.'},
+{q:'Menyimpan makanan sebaiknya dilakukan...', c:'Dalam wadah tertutup agar terhindar dari lalat dan debu', w:['Terbuka di atas meja', 'Di lantai', 'Dekat tempat sampah'], e:'Wadah tertutup melindungi makanan dari kontaminasi lalat, debu, dan kuman.'},
+{q:'Sanitasi dasar yang baik di rumah mencakup...', c:'Ketersediaan jamban sehat dan air bersih', w:['Membuang sampah ke sungai', 'Menampung air kotor di dalam rumah', 'Membiarkan got tersumbat'], e:'Sanitasi dasar meliputi jamban sehat, air bersih, dan pengelolaan limbah yang benar.'},
+{q:'Cara membuang sampah yang benar adalah...', c:'Membuang pada tempat sampah dan memilahnya jika memungkinkan', w:['Membuang ke sungai atau selokan', 'Membakar sembarangan di dalam rumah', 'Membiarkannya menumpuk'], e:'Sampah dibuang pada tempatnya dan dipilah untuk menjaga kebersihan dan kesehatan.'},
+{q:'Ciri jamban yang sehat adalah...', c:'Tidak mencemari sumber air dan mudah dibersihkan', w:['Berada tepat di atas sumur', 'Terbuka tanpa penutup', 'Berdekatan dengan tempat makan'], e:'Jamban sehat tidak mencemari air, tertutup, dan mudah dibersihkan.'},
+{q:'Rumah yang sehat memiliki...', c:'Ventilasi dan pencahayaan yang cukup', w:['Ruangan lembap tanpa jendela', 'Udara yang pengap', 'Cahaya matahari yang tidak masuk sama sekali'], e:'Rumah sehat butuh ventilasi dan cahaya cukup agar tidak lembap dan bebas kuman.'},
+{q:'Setelah batuk atau bersin, sebaiknya kita...', c:'Mencuci tangan', w:['Langsung menyentuh makanan', 'Menyalami banyak orang', 'Mengusap mata'], e:'Mencuci tangan setelah batuk atau bersin mencegah penularan kuman.'},
+{q:'Air yang aman untuk diminum sebaiknya...', c:'Dimasak hingga mendidih atau diolah dengan benar', w:['Diambil langsung dari sungai', 'Dibiarkan terbuka semalaman', 'Dicampur dengan air kotor'], e:'Air minum aman perlu dimasak hingga mendidih atau melalui pengolahan yang tepat.'},
+{q:'Manfaat menerapkan PHBS adalah...', c:'Mencegah berbagai penyakit menular', w:['Menambah biaya hidup tanpa manfaat', 'Membuat lingkungan menjadi kotor', 'Menurunkan daya tahan tubuh'], e:'PHBS membantu mencegah penyakit menular dan menjaga lingkungan sehat.'},
+{q:'Menggosok gigi yang dianjurkan dilakukan...', c:'Minimal dua kali sehari, pagi dan malam sebelum tidur', w:['Sekali seminggu', 'Hanya saat gigi sakit', 'Setiap satu jam'], e:'Menyikat gigi dua kali sehari, pagi dan sebelum tidur, menjaga kesehatan mulut.'},
+{q:'Kuku yang panjang dan kotor sebaiknya...', c:'Dipotong dan dijaga tetap bersih', w:['Dibiarkan panjang', 'Digunakan untuk mengorek makanan', 'Tidak perlu diperhatikan'], e:'Kuku pendek dan bersih mencegah kuman bersarang dan masuk ke tubuh.'},
+{q:'Salah satu perilaku PHBS di rumah tangga adalah...', c:'Menggunakan air bersih dan mencuci tangan pakai sabun', w:['Merokok di dalam rumah', 'Membuang sampah sembarangan', 'Membiarkan genangan air'], e:'Menggunakan air bersih dan cuci tangan pakai sabun termasuk indikator PHBS rumah tangga.'},
+{q:'Menguras bak mandi sebaiknya dilakukan secara...', c:'Rutin, minimal seminggu sekali', w:['Setahun sekali', 'Tidak pernah', 'Hanya saat kotor terlihat parah'], e:'Menguras bak air secara rutin mencegah jentik nyamuk berkembang biak.'},
+{q:'Menutup penampungan air bertujuan untuk...', c:'Mencegah nyamuk bertelur di dalamnya', w:['Menjaga air tetap dingin', 'Menghemat sabun', 'Mempercantik rumah'], e:'Menutup penampungan air mencegah nyamuk bertelur, bagian dari 3M.'},
+{q:'Kebiasaan yang bukan bagian dari PHBS adalah...', c:'Merokok di dalam ruangan bersama keluarga', w:['Mencuci tangan pakai sabun', 'Makan sayur dan buah', 'Membuang sampah pada tempatnya'], e:'Merokok di dalam ruangan bertentangan dengan PHBS karena membahayakan kesehatan.'},
+{q:'Sebelum menyiapkan makanan, hal pertama yang harus dilakukan adalah...', c:'Mencuci tangan hingga bersih', w:['Menyalakan televisi', 'Menyentuh uang', 'Mengelap meja dengan kain kotor'], e:'Mencuci tangan sebelum menyiapkan makanan mencegah kontaminasi kuman.'},
+{q:'Selokan yang tersumbat dapat menyebabkan...', c:'Genangan air dan menjadi sarang penyakit', w:['Udara menjadi lebih bersih', 'Air menjadi lebih jernih', 'Nyamuk berkurang'], e:'Selokan tersumbat menimbulkan genangan yang menjadi sarang nyamuk dan penyakit.'},
+{q:'Salah satu manfaat rumah yang bersih adalah...', c:'Mengurangi risiko penyakit dan membuat penghuni nyaman', w:['Meningkatkan populasi tikus', 'Mengundang lalat', 'Membuat udara pengap'], e:'Rumah bersih menurunkan risiko penyakit dan meningkatkan kenyamanan.'},
+{q:'Handuk dan alat mandi sebaiknya...', c:'Digunakan secara pribadi dan dijaga kebersihannya', w:['Dipakai bergantian oleh banyak orang', 'Dibiarkan lembap', 'Tidak pernah dicuci'], e:'Alat mandi pribadi yang bersih mencegah penularan penyakit kulit dan lainnya.'},
+{q:'Mencuci tangan lebih efektif menggunakan...', c:'Air mengalir dan sabun', w:['Air kotor saja', 'Tisu kering saja', 'Minyak wangi'], e:'Air mengalir dan sabun paling efektif mengangkat kuman dibanding cara lain.'},
+{q:'Membiasakan PHBS sejak dini bertujuan agar...', c:'Menjadi kebiasaan hidup sehat sepanjang hayat', w:['Hanya berlaku saat anak-anak', 'Menambah beban orang tua', 'Membuat anak takut kotor'], e:'PHBS yang ditanamkan sejak dini menjadi kebiasaan sehat seumur hidup.'},
+{q:'Kesimpulan tentang PHBS yang tepat adalah...', c:'PHBS adalah perilaku sederhana namun berdampak besar mencegah penyakit', w:['PHBS hanya urusan pemerintah', 'PHBS mahal dan sulit dilakukan', 'PHBS tidak berpengaruh pada kesehatan'], e:'PHBS terdiri dari perilaku sederhana yang berdampak besar dalam mencegah penyakit.'}
+]},
+gizi: {name:'Gizi Seimbang', short:'Gizi Seimbang', icon:'🍽️', q:[
+{q:'Ada berapa pilar dalam konsep Gizi Seimbang?', c:'4 pilar', w:['3 pilar', '5 pilar', '2 pilar'], e:'Gizi seimbang memiliki 4 pilar.'},
+{q:'Salah satu pilar gizi seimbang adalah...', c:'Mengonsumsi anekaragam pangan', w:['Makan satu jenis makanan saja', 'Menghindari semua jenis lemak', 'Berpuasa sepanjang hari'], e:'Pilar pertama gizi seimbang adalah mengonsumsi anekaragam pangan.'},
+{q:'Pilar gizi seimbang yang berkaitan dengan berat badan adalah...', c:'Memantau dan mempertahankan berat badan normal', w:['Menaikkan berat badan sebanyak mungkin', 'Mengabaikan berat badan', 'Menurunkan berat badan secara drastis'], e:'Salah satu pilar adalah memantau berat badan agar tetap normal.'},
+{q:'Pedoman Isi Piringku menganjurkan setengah piring diisi dengan...', c:'Sayur dan buah', w:['Nasi saja', 'Lauk hewani saja', 'Makanan manis'], e:'Isi Piringku menganjurkan separuh piring untuk sayur dan buah, separuh lagi untuk makanan pokok dan lauk.'},
+{q:'Dalam Isi Piringku, porsi sayur sebaiknya...', c:'Lebih banyak daripada buah', w:['Sama sekali tidak ada', 'Lebih sedikit daripada gula', 'Hanya sebagai hiasan'], e:'Pada separuh piring sayur dan buah, porsi sayur dianjurkan lebih banyak daripada buah.'},
+{q:'Anjuran minum air putih per hari menurut pedoman gizi seimbang adalah...', c:'Sekitar 8 gelas', w:['1 gelas', '20 gelas', 'Tidak perlu minum air'], e:'Dianjurkan minum sekitar 8 gelas air putih per hari.'},
+{q:'Contoh sumber karbohidrat sebagai makanan pokok adalah...', c:'Nasi, jagung, dan ubi', w:['Ayam dan telur', 'Bayam dan wortel', 'Jeruk dan apel'], e:'Makanan pokok sumber karbohidrat contohnya nasi, jagung, ubi, dan singkong.'},
+{q:'Contoh sumber protein hewani adalah...', c:'Ikan, telur, dan daging', w:['Bayam dan kangkung', 'Beras dan gandum', 'Apel dan pisang'], e:'Protein hewani berasal dari ikan, telur, daging, dan susu.'},
+{q:'Contoh sumber protein nabati adalah...', c:'Tahu, tempe, dan kacang-kacangan', w:['Daging sapi', 'Ikan laut', 'Telur ayam'], e:'Protein nabati berasal dari tahu, tempe, dan kacang-kacangan.'},
+{q:'Mengapa sarapan itu penting?', c:'Menyediakan energi untuk beraktivitas dan menjaga konsentrasi', w:['Membuat tubuh menjadi lemas', 'Menaikkan berat badan berlebih', 'Tidak ada manfaatnya'], e:'Sarapan memberi energi untuk beraktivitas dan menjaga konsentrasi, terutama saat belajar.'},
+{q:'Anjuran konsumsi gula, garam, dan lemak (GGL) adalah...', c:'Dibatasi agar tidak berlebihan', w:['Dikonsumsi sebanyak-banyaknya', 'Dihindari total selamanya', 'Tidak perlu diperhatikan'], e:'Gula, garam, dan lemak perlu dibatasi untuk mencegah penyakit tidak menular.'},
+{q:'Fungsi utama sayur dan buah dalam gizi seimbang adalah...', c:'Sumber vitamin, mineral, dan serat', w:['Sumber utama energi', 'Sumber lemak jenuh', 'Pengganti air minum'], e:'Sayur dan buah kaya vitamin, mineral, dan serat.'},
+{q:'Fungsi karbohidrat bagi tubuh adalah...', c:'Sumber utama energi', w:['Membangun otot', 'Menyimpan air', 'Membunuh kuman'], e:'Karbohidrat adalah sumber utama energi tubuh.'},
+{q:'Fungsi protein bagi tubuh adalah...', c:'Membangun dan memperbaiki jaringan tubuh', w:['Sumber utama serat', 'Menggantikan fungsi air', 'Menurunkan suhu tubuh'], e:'Protein berfungsi membangun dan memperbaiki sel serta jaringan tubuh.'},
+{q:'Contoh menu sarapan bergizi seimbang adalah...', c:'Nasi, telur, tumis sayur, dan buah', w:['Hanya kopi manis', 'Gorengan dan minuman bersoda', 'Permen dan keripik'], e:'Sarapan seimbang mengandung karbohidrat, protein, sayur, dan buah.'},
+{q:'Istilah anekaragam pangan bermakna...', c:'Mengonsumsi berbagai jenis makanan agar zat gizi lengkap', w:['Makan makanan yang itu-itu saja', 'Hanya makan yang mahal', 'Menghindari sayuran'], e:'Anekaragam pangan memastikan tubuh mendapat zat gizi yang lengkap dan seimbang.'},
+{q:'Konsumsi gula yang berlebih dapat meningkatkan risiko...', c:'Diabetes dan obesitas', w:['Tulang yang lebih kuat', 'Penglihatan lebih tajam', 'Kekebalan yang lebih tinggi'], e:'Gula berlebih meningkatkan risiko obesitas dan diabetes.'},
+{q:'Garam berlebih dalam makanan dapat memicu...', c:'Tekanan darah tinggi', w:['Gigi menjadi lebih kuat', 'Tidur lebih nyenyak', 'Kulit lebih sehat'], e:'Konsumsi garam berlebih dikaitkan dengan tekanan darah tinggi atau hipertensi.'},
+{q:'Kelompok pangan yang menjadi sumber energi utama adalah...', c:'Makanan pokok', w:['Buah-buahan', 'Air putih', 'Garam'], e:'Makanan pokok yang mengandung karbohidrat adalah sumber energi utama.'},
+{q:'Aktivitas fisik termasuk pilar gizi seimbang karena...', c:'Membantu menyeimbangkan energi yang masuk dan keluar', w:['Menggantikan kebutuhan makan', 'Membuat orang tidak perlu tidur', 'Tidak berhubungan dengan gizi'], e:'Aktivitas fisik menyeimbangkan asupan dan penggunaan energi, salah satu pilar gizi seimbang.'},
+{q:'Melewatkan sarapan dapat menyebabkan...', c:'Sulit berkonsentrasi dan cepat lelah', w:['Konsentrasi meningkat', 'Tubuh lebih bugar', 'Energi bertambah'], e:'Melewatkan sarapan membuat tubuh kekurangan energi sehingga sulit fokus dan cepat lelah.'},
+{q:'Contoh perilaku hidup bersih yang menjadi pilar gizi seimbang adalah...', c:'Mencuci tangan sebelum makan', w:['Makan sambil bermain gawai', 'Tidak mencuci bahan makanan', 'Membeli makanan tanpa memeriksa kebersihan'], e:'Perilaku hidup bersih seperti mencuci tangan sebelum makan adalah salah satu pilar gizi seimbang.'},
+{q:'Susu termasuk dalam kelompok pangan sumber...', c:'Protein dan kalsium', w:['Karbohidrat murni', 'Serat pangan', 'Lemak jenuh saja'], e:'Susu adalah sumber protein hewani dan kalsium yang baik.'},
+{q:'Kekurangan gizi jangka panjang pada anak dapat menyebabkan...', c:'Gangguan pertumbuhan seperti stunting', w:['Pertumbuhan yang lebih cepat', 'Kecerdasan yang meningkat', 'Berat badan berlebih'], e:'Kekurangan gizi kronis pada anak dapat menyebabkan stunting atau gagal tumbuh.'},
+{q:'Porsi makanan pokok dan lauk pada Isi Piringku mengisi...', c:'Separuh piring', w:['Seluruh piring', 'Hanya seperempat', 'Tidak ada porsinya'], e:'Separuh piring untuk makanan pokok dan lauk, separuh lagi untuk sayur dan buah.'},
+{q:'Buah sebaiknya dikonsumsi...', c:'Setiap hari sebagai sumber vitamin dan serat', w:['Hanya saat sakit', 'Sebulan sekali', 'Sebagai pengganti seluruh makan malam'], e:'Buah dianjurkan dikonsumsi setiap hari untuk memenuhi kebutuhan vitamin dan serat.'},
+{q:'Minuman yang paling baik untuk memenuhi kebutuhan cairan adalah...', c:'Air putih', w:['Minuman bersoda', 'Minuman bergula tinggi', 'Kopi kental setiap saat'], e:'Air putih adalah pilihan terbaik untuk memenuhi kebutuhan cairan tanpa tambahan gula.'},
+{q:'Manfaat serat dari sayur dan buah adalah...', c:'Melancarkan pencernaan', w:['Menambah kadar gula darah', 'Menggantikan protein', 'Menyebabkan sembelit'], e:'Serat membantu melancarkan pencernaan dan mencegah sembelit.'},
+{q:'Prinsip gizi seimbang menekankan keseimbangan antara...', c:'Asupan zat gizi dan kebutuhan tubuh', w:['Makanan mahal dan murah', 'Rasa manis dan asin', 'Warna-warni makanan'], e:'Gizi seimbang menyeimbangkan asupan zat gizi dengan kebutuhan tubuh sesuai usia dan aktivitas.'},
+{q:'Kesimpulan tentang gizi seimbang yang tepat adalah...', c:'Makan beragam dengan porsi sesuai kebutuhan disertai hidup aktif dan bersih', w:['Cukup makan satu jenis makanan', 'Makan sebanyak mungkin tanpa aturan', 'Menghindari semua karbohidrat'], e:'Gizi seimbang berarti makan beragam dengan porsi tepat, disertai aktivitas fisik dan perilaku bersih.'}
+]},
+aktivitas: {name:'Aktivitas Fisik dan Istirahat', short:'Aktivitas & Istirahat', icon:'🏃', q:[
+{q:'Aktivitas fisik adalah...', c:'Setiap gerakan tubuh yang menggunakan energi', w:['Hanya olahraga di pusat kebugaran', 'Kegiatan duduk seharian', 'Tidur siang'], e:'Aktivitas fisik adalah setiap gerakan tubuh oleh otot yang memerlukan energi.'},
+{q:'Ada berapa tingkatan intensitas aktivitas fisik?', c:'3 tingkatan', w:['2 tingkatan', '4 tingkatan', '5 tingkatan'], e:'Intensitas aktivitas fisik dibagi menjadi tiga: ringan, sedang, dan berat.'},
+{q:'Contoh aktivitas fisik intensitas ringan adalah...', c:'Berjalan santai dan menyapu lantai', w:['Berlari cepat', 'Angkat beban berat', 'Lari sprint'], e:'Aktivitas ringan misalnya berjalan santai, menyapu, atau pekerjaan rumah ringan.'},
+{q:'Contoh aktivitas fisik intensitas sedang adalah...', c:'Berjalan cepat atau bersepeda santai', w:['Duduk menonton televisi', 'Tidur', 'Berbaring'], e:'Aktivitas sedang membuat napas sedikit lebih cepat, seperti jalan cepat atau bersepeda santai.'},
+{q:'Contoh aktivitas fisik intensitas berat adalah...', c:'Berlari atau bermain sepak bola', w:['Berjalan pelan', 'Membaca buku', 'Duduk santai'], e:'Aktivitas berat membuat napas jauh lebih cepat, seperti berlari atau olahraga intensif.'},
+{q:'Anjuran aktivitas fisik untuk anak dan remaja adalah...', c:'Minimal 60 menit setiap hari', w:['5 menit seminggu', 'Tidak perlu sama sekali', 'Hanya saat pelajaran olahraga'], e:'Anak dan remaja dianjurkan beraktivitas fisik minimal 60 menit setiap hari.'},
+{q:'Salah satu manfaat aktivitas fisik yang teratur adalah...', c:'Menjaga kebugaran dan kesehatan jantung', w:['Membuat tubuh cepat sakit', 'Menurunkan daya tahan tubuh', 'Membuat tulang keropos'], e:'Aktivitas fisik teratur menjaga kebugaran, kesehatan jantung, dan berat badan ideal.'},
+{q:'Prinsip olahraga BBTT adalah singkatan dari...', c:'Baik, Benar, Terukur, dan Teratur', w:['Berat, Banyak, Terus, Tekun', 'Baik, Berani, Tangkas, Tepat', 'Bugar, Bersih, Teratur, Tenang'], e:'BBTT adalah prinsip olahraga: Baik, Benar, Terukur, dan Teratur.'},
+{q:'Melakukan olahraga secara teratur berarti...', c:'Dilakukan rutin beberapa kali dalam seminggu', w:['Hanya sekali dalam setahun', 'Sekali seumur hidup', 'Terus-menerus tanpa henti'], e:'Teratur berarti dilakukan secara rutin, misalnya 3 sampai 5 kali seminggu.'},
+{q:'Sebelum berolahraga sebaiknya melakukan...', c:'Pemanasan', w:['Makan dalam porsi besar', 'Langsung olahraga berat', 'Tidur sebentar'], e:'Pemanasan sebelum olahraga mengurangi risiko cedera.'},
+{q:'Setelah berolahraga sebaiknya melakukan...', c:'Pendinginan', w:['Langsung tidur', 'Makan gorengan', 'Berhenti mendadak lalu duduk'], e:'Pendinginan membantu tubuh kembali normal secara bertahap setelah olahraga.'},
+{q:'Durasi tidur yang dianjurkan untuk remaja adalah...', c:'Sekitar 8 sampai 10 jam per hari', w:['2 sampai 3 jam per hari', '15 jam per hari', 'Tidak perlu tidur'], e:'Remaja dianjurkan tidur sekitar 8 sampai 10 jam per hari.'},
+{q:'Anak usia sekolah dianjurkan tidur selama...', c:'Sekitar 9 sampai 12 jam per hari', w:['3 jam per hari', '4 jam per hari', '15 jam per hari'], e:'Anak usia sekolah, 6 sampai 12 tahun, dianjurkan tidur 9 sampai 12 jam per hari.'},
+{q:'Mengapa istirahat dan tidur yang cukup itu penting?', c:'Memulihkan energi dan menjaga kesehatan tubuh serta pikiran', w:['Membuang waktu', 'Membuat tubuh lemah', 'Menurunkan daya ingat'], e:'Tidur cukup memulihkan energi, menjaga daya tahan tubuh, dan mendukung fungsi otak.'},
+{q:'Kurang tidur dalam jangka panjang dapat menyebabkan...', c:'Menurunnya konsentrasi dan daya tahan tubuh', w:['Meningkatnya kebugaran', 'Kulit lebih sehat', 'Emosi lebih stabil'], e:'Kurang tidur menurunkan konsentrasi, daya tahan tubuh, dan mengganggu suasana hati.'},
+{q:'Kebiasaan yang mendukung tidur berkualitas adalah...', c:'Tidur dan bangun pada waktu yang teratur', w:['Bermain gawai hingga larut malam', 'Minum kopi sebelum tidur', 'Tidur siang yang sangat lama'], e:'Jadwal tidur teratur dan mengurangi gawai sebelum tidur mendukung tidur berkualitas.'},
+{q:'Terlalu banyak duduk atau rebahan sepanjang hari disebut...', c:'Perilaku sedentari', w:['Aktivitas berat', 'Olahraga teratur', 'Pemanasan'], e:'Perilaku sedentari adalah kebiasaan kurang gerak yang meningkatkan risiko penyakit.'},
+{q:'Salah satu manfaat aktivitas fisik bagi kesehatan mental adalah...', c:'Mengurangi stres dan memperbaiki suasana hati', w:['Menambah rasa cemas', 'Membuat sulit tidur', 'Menurunkan rasa percaya diri'], e:'Aktivitas fisik melepaskan hormon yang membantu mengurangi stres dan memperbaiki suasana hati.'},
+{q:'Olahraga yang terukur berarti...', c:'Dilakukan dengan intensitas dan waktu yang sesuai kemampuan', w:['Tanpa memperhatikan kemampuan tubuh', 'Selalu berintensitas maksimal', 'Tanpa batas waktu'], e:'Terukur berarti intensitas dan durasi disesuaikan dengan kemampuan dan diukur perkembangannya.'},
+{q:'Contoh olahraga ringan yang bisa dilakukan di rumah adalah...', c:'Peregangan dan senam ringan', w:['Angkat beban maksimal', 'Lari maraton', 'Tinju profesional'], e:'Peregangan dan senam ringan cocok dilakukan di rumah untuk menjaga kebugaran.'},
+{q:'Aktivitas fisik membantu mengendalikan berat badan karena...', c:'Membakar kalori atau energi', w:['Menambah lemak tubuh', 'Mengurangi massa otot', 'Membuat nafsu makan hilang total'], e:'Aktivitas fisik membakar energi sehingga membantu mengendalikan berat badan.'},
+{q:'Anjuran aktivitas fisik untuk orang dewasa adalah...', c:'Minimal 150 menit per minggu dengan intensitas sedang', w:['10 menit per bulan', 'Tidak perlu berolahraga', 'Hanya saat liburan'], e:'Orang dewasa dianjurkan beraktivitas fisik intensitas sedang minimal 150 menit per minggu.'},
+{q:'Duduk terlalu lama sebaiknya diselingi dengan...', c:'Bangun dan bergerak secara berkala', w:['Menambah waktu duduk', 'Tidur', 'Makan camilan manis'], e:'Menyelingi duduk lama dengan bergerak membantu mengurangi dampak perilaku sedentari.'},
+{q:'Salah satu tanda tubuh kurang istirahat adalah...', c:'Mudah mengantuk dan sulit fokus', w:['Lebih bertenaga', 'Lebih ceria', 'Lebih produktif'], e:'Kurang istirahat membuat tubuh mudah mengantuk, lelah, dan sulit berkonsentrasi.'},
+{q:'Olahraga yang benar berarti...', c:'Dilakukan dengan teknik dan tahapan yang tepat', w:['Asal bergerak tanpa teknik', 'Meniru tanpa memahami', 'Memaksakan gerakan berbahaya'], e:'Benar berarti sesuai teknik dan tahapan, seperti pemanasan, inti, dan pendinginan, agar aman.'},
+{q:'Aktivitas fisik pada anak sebaiknya dilakukan dengan cara...', c:'Menyenangkan, seperti bermain dan berolahraga bersama', w:['Memaksa dengan latihan berat', 'Melarang bermain di luar', 'Hanya diam di dalam rumah'], e:'Aktivitas fisik anak sebaiknya menyenangkan agar menjadi kebiasaan, seperti bermain aktif.'},
+{q:'Manfaat aktivitas fisik bagi tulang dan otot adalah...', c:'Membuat tulang dan otot menjadi lebih kuat', w:['Membuat tulang rapuh', 'Melemahkan otot', 'Tidak berpengaruh'], e:'Aktivitas fisik yang teratur memperkuat tulang dan otot.'},
+{q:'Menatap layar gawai terlalu lama sebelum tidur dapat...', c:'Mengganggu kualitas tidur', w:['Membuat tidur lebih nyenyak', 'Mempercepat rasa kantuk', 'Tidak berpengaruh sama sekali'], e:'Cahaya layar gawai sebelum tidur dapat mengganggu kualitas tidur.'},
+{q:'Keseimbangan antara aktivitas fisik dan istirahat penting untuk...', c:'Menjaga kesehatan tubuh secara menyeluruh', w:['Membuat tubuh cepat lelah', 'Menghabiskan waktu', 'Menurunkan kebugaran'], e:'Keseimbangan aktivitas dan istirahat menjaga kebugaran dan kesehatan secara menyeluruh.'},
+{q:'Kesimpulan tentang aktivitas fisik dan istirahat yang tepat adalah...', c:'Keduanya harus seimbang: aktif bergerak dan cukup istirahat setiap hari', w:['Cukup salah satu saja', 'Olahraga tanpa istirahat', 'Istirahat terus tanpa bergerak'], e:'Aktivitas fisik dan istirahat yang cukup harus seimbang untuk kesehatan yang optimal.'}
+]},
+pencegahan: {name:'Pencegahan Penyakit', short:'Pencegahan Penyakit', icon:'🛡️', q:[
+{q:'Penyakit menular adalah penyakit yang...', c:'Dapat berpindah dari satu orang ke orang lain', w:['Hanya diturunkan secara genetik', 'Tidak bisa dicegah', 'Selalu berasal dari makanan'], e:'Penyakit menular dapat berpindah dari satu orang, hewan, atau lingkungan ke orang lain melalui berbagai cara.'},
+{q:'Contoh penyakit menular adalah...', c:'Influenza dan tuberkulosis', w:['Diabetes', 'Hipertensi', 'Kanker'], e:'Influenza dan TBC adalah penyakit menular; diabetes dan hipertensi termasuk penyakit tidak menular.'},
+{q:'CERDIK dalam pencegahan penyakit tidak menular meliputi, kecuali...', c:'Merokok setiap hari', w:['Cek kesehatan berkala', 'Rajin aktivitas fisik', 'Kelola stres'], e:'CERDIK justru menganjurkan Enyahkan asap rokok, bukan merokok.'},
+{q:'Huruf C pada CERDIK berarti...', c:'Cek kesehatan secara berkala', w:['Cukup tidur siang', 'Cuci tangan', 'Cepat berobat'], e:'C pada CERDIK berarti Cek kesehatan secara berkala.'},
+{q:'Huruf E pada CERDIK berarti...', c:'Enyahkan asap rokok', w:['Enak makan sepuasnya', 'Energi berlebih', 'Emosi terjaga'], e:'E pada CERDIK berarti Enyahkan asap rokok.'},
+{q:'Etika batuk yang benar adalah...', c:'Menutup mulut dan hidung dengan tisu atau lengan atas bagian dalam', w:['Membuka mulut lebar tanpa penutup', 'Menutup dengan telapak tangan lalu bersalaman', 'Batuk ke arah orang lain'], e:'Etika batuk yang benar adalah menutup mulut dan hidung dengan tisu atau lengan atas bagian dalam.'},
+{q:'Setelah batuk atau bersin menggunakan tisu, sebaiknya...', c:'Membuang tisu ke tempat sampah dan mencuci tangan', w:['Menyimpan tisu di saku', 'Memakai kembali tisu tersebut', 'Membiarkan tisu di meja'], e:'Tisu bekas dibuang ke tempat sampah lalu cuci tangan untuk mencegah penularan.'},
+{q:'Imunisasi bertujuan untuk...', c:'Membentuk kekebalan tubuh terhadap penyakit tertentu', w:['Menyembuhkan semua penyakit', 'Menggantikan makanan bergizi', 'Membuat anak sakit'], e:'Imunisasi membentuk kekebalan tubuh sehingga terlindungi dari penyakit tertentu.'},
+{q:'Salah satu imunisasi dasar yang diberikan pada bayi adalah...', c:'BCG untuk mencegah TBC', w:['Vaksin flu tahunan wajib', 'Vaksin untuk lansia', 'Vaksin perjalanan'], e:'BCG termasuk imunisasi dasar bayi untuk mencegah tuberkulosis.'},
+{q:'Imunisasi campak atau MR bertujuan mencegah penyakit...', c:'Campak dan rubela', w:['Diabetes', 'Demam berdarah', 'Hipertensi'], e:'Imunisasi MR mencegah campak (measles) dan rubela.'},
+{q:'Imunisasi dasar lengkap umumnya diberikan pada rentang usia...', c:'0 sampai 18 bulan', w:['5 sampai 10 tahun', '20 sampai 30 tahun', 'Hanya saat lahir'], e:'Imunisasi dasar lengkap diberikan pada rentang usia 0 sampai 18 bulan.'},
+{q:'Rantai penularan penyakit dapat diputus dengan cara...', c:'Menjaga kebersihan dan mencuci tangan', w:['Membiarkan lingkungan kotor', 'Berbagi alat makan saat sakit', 'Mengabaikan kebersihan'], e:'Memutus rantai penularan dapat dilakukan dengan menjaga kebersihan, cuci tangan, dan isolasi saat sakit.'},
+{q:'Salah satu cara penularan penyakit melalui udara adalah...', c:'Percikan droplet saat batuk atau bersin', w:['Menatap orang sakit', 'Memikirkan penyakit', 'Berjalan di taman'], e:'Banyak penyakit pernapasan menular melalui droplet saat batuk atau bersin.'},
+{q:'Menggunakan masker saat sakit bertujuan untuk...', c:'Mencegah penyebaran kuman ke orang lain', w:['Mempercantik penampilan', 'Menghangatkan wajah', 'Menggantikan obat'], e:'Masker membantu mencegah percikan droplet menyebar ke orang lain.'},
+{q:'Contoh pemeriksaan kesehatan sederhana yang bisa dilakukan sendiri adalah...', c:'Menimbang berat badan dan mengukur tinggi badan', w:['Melakukan operasi', 'Membaca hasil rontgen', 'Meracik obat sendiri'], e:'Pemeriksaan sederhana seperti menimbang berat badan dan mengukur tinggi badan bisa dilakukan mandiri.'},
+{q:'Huruf D pada CERDIK berarti...', c:'Diet sehat dengan gizi seimbang', w:['Diam di rumah', 'Duduk santai', 'Diet ketat tanpa makan'], e:'D pada CERDIK berarti Diet sehat dengan kalori seimbang.'},
+{q:'Huruf I pada CERDIK berarti...', c:'Istirahat yang cukup', w:['Ingat masa lalu', 'Isolasi total', 'Ikut lomba'], e:'I pada CERDIK berarti Istirahat yang cukup.'},
+{q:'Huruf K pada CERDIK berarti...', c:'Kelola stres', w:['Konsumsi gula', 'Kurang tidur', 'Kumpul keramaian'], e:'K pada CERDIK berarti Kelola stres dengan baik.'},
+{q:'Salah satu cara mencegah penyakit menular melalui makanan adalah...', c:'Memasak makanan hingga matang dan menjaga kebersihannya', w:['Makan makanan mentah yang kotor', 'Menggunakan air kotor', 'Membiarkan makanan basi'], e:'Memasak hingga matang dan menjaga kebersihan makanan mencegah penyakit yang ditularkan lewat makanan.'},
+{q:'Menjaga daya tahan tubuh dapat dilakukan dengan...', c:'Makan bergizi, olahraga, dan istirahat cukup', w:['Begadang setiap malam', 'Makan tidak teratur', 'Menghindari sinar matahari sepenuhnya'], e:'Daya tahan tubuh terjaga dengan gizi seimbang, aktivitas fisik, dan istirahat cukup.'},
+{q:'Penyakit tidak menular seperti hipertensi dapat dicegah dengan...', c:'Menerapkan pola hidup sehat sesuai CERDIK', w:['Merokok', 'Makan tinggi garam terus-menerus', 'Menghindari olahraga'], e:'Penyakit tidak menular dicegah dengan pola hidup sehat seperti yang dianjurkan CERDIK.'},
+{q:'Ketika ada anggota keluarga yang sakit menular, sebaiknya...', c:'Memisahkan alat makan dan menjaga kebersihan', w:['Berbagi alat makan seperti biasa', 'Tidur bersama dalam satu selimut', 'Mengabaikannya'], e:'Memisahkan alat makan dan menjaga kebersihan membantu mencegah penularan ke anggota lain.'},
+{q:'Vaksinasi yang mencapai banyak orang dapat menciptakan...', c:'Kekebalan kelompok yang melindungi masyarakat', w:['Wabah penyakit baru', 'Ketergantungan obat', 'Kelemahan tubuh massal'], e:'Cakupan imunisasi yang tinggi menciptakan kekebalan kelompok yang melindungi masyarakat.'},
+{q:'Pintu masuk kuman ke dalam tubuh dapat melalui...', c:'Mulut, hidung, dan luka pada kulit', w:['Rambut', 'Kuku yang bersih', 'Bayangan tubuh'], e:'Kuman dapat masuk melalui mulut, hidung, mata, dan luka pada kulit.'},
+{q:'Deteksi dini penyakit penting karena...', c:'Memungkinkan penanganan lebih cepat dan tepat', w:['Membuat penyakit bertambah parah', 'Tidak ada manfaatnya', 'Menghabiskan waktu percuma'], e:'Deteksi dini memungkinkan penyakit ditangani lebih cepat sebelum bertambah parah.'},
+{q:'Contoh penerapan huruf R pada CERDIK adalah...', c:'Rajin melakukan aktivitas fisik', w:['Rutin merokok', 'Rebahan sepanjang hari', 'Rajin begadang'], e:'R pada CERDIK berarti Rajin melakukan aktivitas fisik.'},
+{q:'Cara sederhana mencegah penyebaran penyakit di sekolah adalah...', c:'Membiasakan cuci tangan dan tidak masuk saat sakit menular', w:['Tetap masuk meski sakit parah', 'Berbagi botol minum', 'Mengabaikan kebersihan kelas'], e:'Membiasakan cuci tangan dan beristirahat di rumah saat sakit menular mencegah penyebaran di sekolah.'},
+{q:'Menjaga lingkungan tetap bersih membantu mencegah penyakit karena...', c:'Mengurangi tempat berkembang biak kuman dan vektor penyakit', w:['Menambah populasi nyamuk', 'Membuat kuman berkembang', 'Tidak berpengaruh apa pun'], e:'Lingkungan bersih mengurangi tempat berkembang biak kuman dan vektor seperti nyamuk dan lalat.'},
+{q:'Tujuan utama pencegahan penyakit adalah...', c:'Menghindari terjadinya penyakit sebelum muncul', w:['Mengobati penyakit setelah parah', 'Menunggu sakit lalu berobat', 'Menyebarkan penyakit'], e:'Pencegahan bertujuan menghindari penyakit sebelum terjadi, lebih baik daripada mengobati.'},
+{q:'Kesimpulan tentang pencegahan penyakit yang tepat adalah...', c:'Mencegah lebih baik daripada mengobati melalui pola hidup sehat, imunisasi, dan kebersihan', w:['Cukup menunggu sampai sakit', 'Mengandalkan obat saja', 'Mengabaikan kebersihan diri'], e:'Pencegahan melalui pola hidup sehat, imunisasi, dan kebersihan lebih baik daripada mengobati.'}
+]},
+mental: {name:'Kesehatan Mental Dasar', short:'Kesehatan Mental', icon:'💚', q:[
+{q:'Kesehatan mental adalah...', c:'Kondisi sejahtera secara emosi, psikologis, dan sosial', w:['Kondisi tidak pernah merasa sedih', 'Keadaan bebas dari semua masalah', 'Kemampuan menyembunyikan perasaan'], e:'Kesehatan mental adalah kondisi sejahtera secara emosi, psikologis, dan sosial, bukan sekadar tidak ada masalah.'},
+{q:'Stres adalah...', c:'Reaksi tubuh dan pikiran terhadap tekanan atau tuntutan', w:['Penyakit menular', 'Sesuatu yang selalu buruk', 'Tanda kelemahan pribadi'], e:'Stres adalah reaksi alami tubuh dan pikiran terhadap tekanan; dalam kadar wajar bisa bermanfaat.'},
+{q:'Salah satu tanda seseorang mengalami stres adalah...', c:'Sulit tidur dan mudah marah', w:['Selalu merasa tenang', 'Tidak pernah lelah', 'Konsentrasi selalu meningkat'], e:'Tanda stres antara lain sulit tidur, mudah marah, cemas, dan sulit berkonsentrasi.'},
+{q:'Cara sehat untuk mengelola stres adalah...', c:'Berolahraga, beristirahat, dan berbagi cerita dengan orang tepercaya', w:['Memendam semua perasaan', 'Menyalahkan diri terus-menerus', 'Menghindari semua orang'], e:'Mengelola stres secara sehat meliputi aktivitas fisik, istirahat, dan berbagi cerita dengan orang tepercaya.'},
+{q:'Ketika merasa sedih atau cemas berlebihan, langkah yang tepat adalah...', c:'Menceritakan perasaan kepada orang yang dipercaya atau mencari bantuan', w:['Memendamnya sendiri', 'Berpura-pura tidak ada masalah', 'Mengurung diri terus-menerus'], e:'Berbagi perasaan dan mencari dukungan membantu meringankan beban emosi.'},
+{q:'Dukungan sosial dari keluarga dan teman berperan untuk...', c:'Membantu seseorang merasa didengar dan tidak sendirian', w:['Menambah tekanan', 'Membuat masalah makin berat', 'Tidak ada manfaatnya'], e:'Dukungan sosial membuat seseorang merasa didengar, diterima, dan tidak sendirian menghadapi masalah.'},
+{q:'Salah satu cara mengelola emosi yang baik adalah...', c:'Mengenali emosi lalu mengekspresikannya dengan cara yang sehat', w:['Meluapkan amarah pada orang lain', 'Menahan semua emosi hingga meledak', 'Menyakiti diri sendiri'], e:'Mengelola emosi yang sehat dimulai dengan mengenali emosi dan menyalurkannya secara positif.'},
+{q:'Aktivitas yang dapat membantu menjaga kesehatan mental adalah...', c:'Berolahraga, melakukan hobi, dan beristirahat cukup', w:['Begadang setiap malam', 'Mengisolasi diri sepenuhnya', 'Memendam semua masalah'], e:'Olahraga, hobi, relaksasi, dan istirahat cukup membantu menjaga kesehatan mental.'},
+{q:'Menjaga kesehatan mental sama pentingnya dengan...', c:'Menjaga kesehatan fisik', w:['Mengumpulkan harta', 'Mengejar popularitas', 'Menghindari tanggung jawab'], e:'Kesehatan mental dan fisik saling terkait dan sama pentingnya.'},
+{q:'Teknik sederhana untuk menenangkan diri saat cemas adalah...', c:'Menarik napas dalam secara perlahan', w:['Menahan napas selama mungkin', 'Berteriak sekeras-kerasnya', 'Berlari tanpa tujuan'], e:'Teknik pernapasan dalam yang perlahan membantu menenangkan tubuh dan pikiran saat cemas.'},
+{q:'Berpikir positif dapat membantu kesehatan mental karena...', c:'Membantu menghadapi masalah dengan lebih tenang', w:['Menghilangkan semua masalah seketika', 'Membuat seseorang mengabaikan kenyataan', 'Membuat orang malas berusaha'], e:'Berpikir positif membantu seseorang menghadapi masalah dengan lebih tenang dan mencari solusi.'},
+{q:'Jika stres terasa berat dan berkepanjangan, sebaiknya...', c:'Mencari bantuan profesional seperti psikolog atau konselor', w:['Membiarkannya saja', 'Menyimpannya sendiri selamanya', 'Menganggapnya aib'], e:'Stres berat dan berkepanjangan sebaiknya ditangani dengan bantuan profesional.'},
+{q:'Mengelola waktu dengan baik dapat membantu mengurangi stres karena...', c:'Membuat tugas terasa lebih teratur dan tidak menumpuk', w:['Menambah beban pekerjaan', 'Membuat semua tugas mendesak', 'Menghilangkan waktu istirahat'], e:'Manajemen waktu yang baik membuat tugas lebih teratur sehingga mengurangi tekanan.'},
+{q:'Tidur yang cukup berpengaruh pada kesehatan mental karena...', c:'Membantu menstabilkan suasana hati dan memulihkan pikiran', w:['Membuat orang mudah marah', 'Menambah kecemasan', 'Tidak berpengaruh sama sekali'], e:'Tidur cukup membantu menstabilkan emosi dan memulihkan pikiran.'},
+{q:'Sikap yang tepat terhadap teman yang sedang mengalami masalah adalah...', c:'Mendengarkan dengan empati tanpa menghakimi', w:['Mengabaikannya', 'Menertawakannya', 'Menyebarkan masalahnya'], e:'Mendengarkan dengan empati tanpa menghakimi adalah bentuk dukungan yang penting.'},
+{q:'Perasaan sedih sesekali adalah...', c:'Hal yang normal dan wajar dialami setiap orang', w:['Tanda gangguan jiwa berat', 'Sesuatu yang harus disembunyikan', 'Kelemahan yang memalukan'], e:'Merasa sedih sesekali adalah hal wajar; yang penting adalah cara menghadapinya.'},
+{q:'Salah satu penyebab stres pada pelajar adalah...', c:'Tugas yang menumpuk dan tekanan ujian', w:['Istirahat yang cukup', 'Dukungan keluarga', 'Waktu bermain yang seimbang'], e:'Beban tugas dan tekanan ujian adalah penyebab stres yang umum pada pelajar.'},
+{q:'Menjaga hubungan baik dengan orang lain bermanfaat untuk...', c:'Memberi dukungan emosional dan mengurangi rasa kesepian', w:['Menambah rasa terasing', 'Menimbulkan konflik', 'Menurunkan rasa percaya diri'], e:'Hubungan sosial yang baik memberi dukungan emosional dan mengurangi kesepian.'},
+{q:'Cara sehat mengekspresikan kemarahan adalah...', c:'Menenangkan diri lalu menyampaikan perasaan dengan tenang', w:['Membanting barang', 'Menyakiti orang lain', 'Berteriak dan mengumpat'], e:'Kemarahan sebaiknya disalurkan dengan menenangkan diri lalu berkomunikasi secara tenang.'},
+{q:'Melakukan hal yang disukai atau hobi dapat...', c:'Membantu meredakan stres dan meningkatkan suasana hati', w:['Menambah beban pikiran', 'Membuat mudah marah', 'Menurunkan semangat'], e:'Melakukan hobi membantu meredakan stres dan memperbaiki suasana hati.'},
+{q:'Meminta bantuan saat menghadapi masalah adalah tanda...', c:'Kekuatan dan kesadaran diri, bukan kelemahan', w:['Kelemahan yang memalukan', 'Ketidakmampuan total', 'Sesuatu yang harus dihindari'], e:'Meminta bantuan menunjukkan kesadaran diri dan keberanian, bukan kelemahan.'},
+{q:'Membatasi penggunaan media sosial dapat membantu kesehatan mental karena...', c:'Mengurangi tekanan membandingkan diri dengan orang lain', w:['Membuat lebih sering membandingkan diri', 'Menambah rasa cemas', 'Tidak berpengaruh sama sekali'], e:'Membatasi media sosial dapat mengurangi kebiasaan membandingkan diri yang memicu kecemasan.'},
+{q:'Keluarga dapat mendukung kesehatan mental anggotanya dengan cara...', c:'Menciptakan komunikasi terbuka dan saling mendengarkan', w:['Menghakimi setiap masalah', 'Melarang berbagi perasaan', 'Mengabaikan keluhan'], e:'Komunikasi terbuka dan saling mendengarkan dalam keluarga mendukung kesehatan mental.'},
+{q:'Ketika seseorang bercerita tentang masalahnya, respons terbaik adalah...', c:'Menyimak dengan sabar dan menunjukkan kepedulian', w:['Memotong pembicaraan', 'Menyalahkannya', 'Membandingkannya dengan orang lain'], e:'Menyimak dengan sabar dan peduli membuat orang merasa didukung.'},
+{q:'Salah satu manfaat rutin berolahraga bagi mental adalah...', c:'Meningkatkan suasana hati dan mengurangi kecemasan', w:['Menambah rasa lelah mental', 'Meningkatkan stres', 'Membuat mudah tersinggung'], e:'Olahraga melepaskan hormon yang meningkatkan suasana hati dan mengurangi kecemasan.'},
+{q:'Sikap menerima diri sendiri apa adanya membantu...', c:'Membangun rasa percaya diri dan ketenangan batin', w:['Membuat seseorang berhenti berkembang', 'Menambah rasa rendah diri', 'Menimbulkan kesombongan'], e:'Menerima diri apa adanya membantu membangun percaya diri dan ketenangan batin.'},
+{q:'Rutinitas harian yang sehat berperan menjaga kesehatan mental karena...', c:'Memberi rasa teratur dan mengurangi kebingungan', w:['Menimbulkan kekacauan', 'Menambah stres', 'Membuat hidup membosankan sepenuhnya'], e:'Rutinitas sehat memberi rasa teratur dan stabil yang baik bagi kesehatan mental.'},
+{q:'Menuliskan perasaan dalam jurnal dapat membantu...', c:'Memahami dan mengelola emosi dengan lebih baik', w:['Memperburuk suasana hati', 'Menambah kecemasan', 'Menghilangkan ingatan'], e:'Menulis jurnal membantu seseorang mengenali dan mengelola emosinya.'},
+{q:'Menyeimbangkan waktu belajar, istirahat, dan bermain bagi pelajar bertujuan untuk...', c:'Menjaga kesehatan mental agar tidak mudah stres', w:['Menambah beban pikiran', 'Membuat malas belajar', 'Menghilangkan waktu istirahat'], e:'Keseimbangan antara belajar, istirahat, dan bermain membantu menjaga kesehatan mental dan mencegah stres berlebih.'},
+{q:'Kesimpulan tentang kesehatan mental yang tepat adalah...', c:'Kesehatan mental perlu dijaga sama seriusnya dengan kesehatan fisik', w:['Kesehatan mental tidak penting', 'Masalah mental adalah aib', 'Cukup diabaikan sampai hilang sendiri'], e:'Kesehatan mental perlu dijaga sama seriusnya dengan kesehatan fisik melalui kebiasaan sehat dan dukungan sosial.'}
+]},
+informasi: {name:'Memilah Informasi Kesehatan', short:'Memilah Informasi', icon:'🔍', q:[
+{q:'Hoaks kesehatan adalah...', c:'Informasi kesehatan palsu atau menyesatkan yang disebarluaskan', w:['Informasi kesehatan dari dokter', 'Hasil penelitian resmi', 'Panduan dari kementerian kesehatan'], e:'Hoaks kesehatan adalah informasi palsu atau menyesatkan tentang kesehatan yang disebarkan ke masyarakat.'},
+{q:'Langkah pertama saat menerima informasi kesehatan yang meragukan adalah...', c:'Memeriksa kebenarannya sebelum mempercayai atau menyebarkan', w:['Langsung menyebarkannya', 'Langsung mempercayainya', 'Mengabaikan sumber resmi'], e:'Sebelum percaya atau menyebarkan, informasi kesehatan perlu diperiksa kebenarannya terlebih dahulu.'},
+{q:'Sumber informasi kesehatan yang dapat dipercaya adalah...', c:'Situs resmi Kementerian Kesehatan dan tenaga medis', w:['Pesan berantai tanpa sumber', 'Akun anonim di media sosial', 'Iklan produk yang berlebihan'], e:'Sumber tepercaya antara lain situs resmi Kemenkes, WHO, dan tenaga kesehatan profesional.'},
+{q:'Ciri informasi kesehatan yang patut dicurigai sebagai hoaks adalah...', c:'Berjudul bombastis dan meminta segera disebarkan', w:['Mencantumkan sumber ilmiah yang jelas', 'Ditulis oleh ahli yang kredibel', 'Disertai data yang dapat diverifikasi'], e:'Hoaks sering berjudul heboh, membangkitkan emosi, dan mendesak untuk segera disebarkan.'},
+{q:'Memeriksa keaslian sumber informasi disebut...', c:'Verifikasi', w:['Duplikasi', 'Provokasi', 'Manipulasi'], e:'Verifikasi adalah proses memeriksa dan memastikan kebenaran serta keaslian informasi.'},
+{q:'Sebelum membagikan informasi kesehatan, sebaiknya kita bertanya...', c:'Apakah sumbernya jelas dan dapat dipercaya?', w:['Apakah judulnya menarik?', 'Apakah banyak yang menyukainya?', 'Apakah viral di grup?'], e:'Kejelasan dan kredibilitas sumber lebih penting daripada popularitas atau daya tarik judul.'},
+{q:'Membaca berita hanya dari judulnya saja dapat menyebabkan...', c:'Salah paham terhadap isi informasi', w:['Pemahaman yang lebih lengkap', 'Informasi yang lebih akurat', 'Kesimpulan yang tepat'], e:'Judul sering tidak mewakili isi; membaca keseluruhan mencegah kesalahpahaman.'},
+{q:'Ketika menemukan klaim obat yang menjanjikan sembuh total dan cepat, sikap yang tepat adalah...', c:'Bersikap kritis dan memeriksa buktinya', w:['Langsung membeli', 'Langsung mempercayai', 'Menyebarkan ke banyak orang'], e:'Klaim penyembuhan instan tanpa bukti ilmiah perlu disikapi kritis dan diverifikasi.'},
+{q:'Salah satu cara memeriksa kebenaran informasi adalah...', c:'Membandingkan dengan beberapa sumber tepercaya', w:['Mengandalkan satu pesan berantai', 'Percaya pada opini pribadi', 'Melihat jumlah komentar'], e:'Membandingkan informasi dengan beberapa sumber kredibel membantu memastikan kebenarannya.'},
+{q:'Situs web resmi lembaga kesehatan biasanya memiliki domain seperti...', c:'.go.id atau .org lembaga resmi', w:['Nama acak tanpa identitas', 'Blog pribadi tanpa penulis jelas', 'Situs penjual obat ilegal'], e:'Lembaga resmi umumnya menggunakan domain seperti .go.id, WHO, atau organisasi kesehatan yang jelas.'},
+{q:'Informasi kesehatan yang baik sebaiknya didukung oleh...', c:'Bukti ilmiah dan pendapat ahli', w:['Kesaksian tanpa bukti', 'Perasaan pribadi', 'Rumor yang beredar'], e:'Informasi kesehatan yang kredibel didukung bukti ilmiah dan pendapat ahli yang kompeten.'},
+{q:'Menyebarkan hoaks kesehatan dapat berdampak...', c:'Membahayakan kesehatan dan menimbulkan kepanikan', w:['Meningkatkan kesehatan masyarakat', 'Menambah pengetahuan yang benar', 'Tidak berdampak apa pun'], e:'Hoaks kesehatan bisa membahayakan, menimbulkan kepanikan, dan menyebabkan tindakan yang salah.'},
+{q:'Ketika ragu akan suatu informasi kesehatan, sebaiknya bertanya kepada...', c:'Tenaga kesehatan atau ahli yang kompeten', w:['Akun media sosial anonim', 'Penjual produk kesehatan', 'Teman yang juga tidak yakin'], e:'Tenaga kesehatan yang kompeten adalah rujukan yang tepat saat ragu akan informasi kesehatan.'},
+{q:'Salah satu tanda sumber informasi tidak kredibel adalah...', c:'Tidak mencantumkan penulis atau sumber yang jelas', w:['Mencantumkan referensi ilmiah', 'Ditinjau oleh ahli', 'Berasal dari lembaga resmi'], e:'Sumber tidak kredibel biasanya tidak jelas penulis, tanggal, maupun referensinya.'},
+{q:'Berpikir kritis terhadap informasi berarti...', c:'Tidak langsung percaya dan memeriksa kebenarannya', w:['Menerima semua informasi mentah-mentah', 'Menolak semua informasi', 'Hanya percaya yang sesuai keinginan'], e:'Berpikir kritis berarti menilai informasi secara objektif dan memeriksa kebenarannya sebelum mempercayai.'},
+{q:'Foto atau video dalam informasi kesehatan perlu diwaspadai karena...', c:'Bisa saja diedit atau diambil dari konteks yang berbeda', w:['Selalu menunjukkan fakta', 'Tidak mungkin dimanipulasi', 'Pasti benar apa adanya'], e:'Gambar dan video dapat dimanipulasi atau digunakan di luar konteks aslinya.'},
+{q:'Membagikan informasi kesehatan yang belum terverifikasi sebaiknya...', c:'Dihindari sampai kebenarannya dipastikan', w:['Dilakukan secepat mungkin', 'Dilakukan ke semua grup', 'Diprioritaskan agar viral'], e:'Menahan diri membagikan informasi yang belum terverifikasi mencegah penyebaran hoaks.'},
+{q:'Situs pemeriksa fakta berguna untuk...', c:'Mengecek apakah suatu informasi benar atau hoaks', w:['Membuat informasi palsu', 'Menyebarkan rumor', 'Menghapus berita resmi'], e:'Situs pemeriksa fakta membantu mengecek kebenaran suatu klaim atau berita.'},
+{q:'Informasi yang membangkitkan emosi berlebihan sebaiknya...', c:'Diperiksa lebih teliti sebelum dipercaya', w:['Langsung dipercaya karena meyakinkan', 'Segera disebarkan', 'Dijadikan pedoman utama'], e:'Informasi yang sengaja membangkitkan emosi kuat sering menjadi ciri hoaks dan perlu diperiksa.'},
+{q:'Testimoni pribadi tentang suatu obat...', c:'Belum tentu berlaku untuk semua orang dan perlu bukti ilmiah', w:['Selalu benar untuk semua orang', 'Menggantikan penelitian ilmiah', 'Merupakan bukti paling kuat'], e:'Testimoni bersifat individual dan tidak bisa menggantikan bukti ilmiah yang teruji.'},
+{q:'Ketika membaca informasi kesehatan, penting memperhatikan...', c:'Tanggal, sumber, dan penulisnya', w:['Hanya jumlah like', 'Hanya warna tampilan', 'Hanya panjang tulisannya'], e:'Tanggal, sumber, dan penulis membantu menilai keakuratan dan kekinian informasi.'},
+{q:'Sikap bijak dalam bermedia sosial terkait informasi kesehatan adalah...', c:'Saring sebelum sharing', w:['Bagikan dulu, periksa kemudian', 'Percaya semua yang trending', 'Ikuti apa kata banyak orang'], e:'Prinsip "saring sebelum sharing" mencegah kita ikut menyebarkan informasi yang salah.'},
+{q:'Informasi kesehatan yang bertentangan dengan anjuran tenaga medis resmi sebaiknya...', c:'Dikonfirmasi dulu kepada tenaga kesehatan', w:['Langsung diikuti', 'Dipercaya karena berbeda', 'Disebarkan sebagai kebenaran baru'], e:'Informasi yang bertentangan dengan anjuran medis resmi perlu dikonfirmasi kepada ahlinya.'},
+{q:'Salah satu motif penyebaran hoaks kesehatan adalah...', c:'Menipu untuk keuntungan atau menimbulkan kepanikan', w:['Membantu masyarakat', 'Menyampaikan fakta ilmiah', 'Mendukung program kesehatan'], e:'Hoaks sering disebarkan untuk menipu demi keuntungan, sensasi, atau menimbulkan kepanikan.'},
+{q:'Iklan kesehatan yang perlu diwaspadai adalah yang...', c:'Menjanjikan hasil instan tanpa efek samping', w:['Mencantumkan izin edar resmi', 'Menyarankan konsultasi dokter', 'Menjelaskan efek samping dengan jujur'], e:'Iklan yang menjanjikan hasil instan tanpa risiko patut dicurigai sebagai menyesatkan.'},
+{q:'Melek informasi kesehatan (literasi) berarti mampu...', c:'Mencari, memahami, dan menilai informasi kesehatan dengan tepat', w:['Menyebarkan semua informasi', 'Menghafal semua berita', 'Mengabaikan sumber resmi'], e:'Literasi informasi kesehatan adalah kemampuan mencari, memahami, menilai, dan menggunakan informasi kesehatan dengan tepat.'},
+{q:'Ketika sebuah pesan meminta "sebarkan ke 10 orang atau akan celaka", itu adalah ciri...', c:'Hoaks atau pesan berantai yang menyesatkan', w:['Informasi resmi', 'Anjuran medis', 'Fakta ilmiah'], e:'Pesan yang memaksa disebarkan dengan ancaman adalah ciri khas hoaks atau pesan berantai.'},
+{q:'Data statistik dalam informasi kesehatan sebaiknya...', c:'Berasal dari lembaga resmi dan dapat diverifikasi', w:['Dibuat tanpa sumber', 'Berasal dari opini pribadi', 'Diambil dari rumor'], e:'Data statistik yang kredibel berasal dari lembaga resmi dan dapat diverifikasi sumbernya.'},
+{q:'Jika menemukan informasi kesehatan yang salah sudah tersebar, tindakan yang tepat adalah...', c:'Memberi klarifikasi dengan sumber yang benar', w:['Ikut menyebarkannya', 'Membiarkannya saja', 'Menambah informasi palsu lain'], e:'Memberikan klarifikasi dengan sumber yang benar membantu meluruskan informasi yang salah.'},
+{q:'Kesimpulan tentang memilah informasi kesehatan yang tepat adalah...', c:'Selalu cek sumber dan kebenaran sebelum percaya atau menyebarkan', w:['Percayai semua yang viral', 'Sebarkan tanpa memeriksa', 'Abaikan sumber resmi'], e:'Kunci memilah informasi kesehatan adalah selalu memeriksa sumber dan kebenaran sebelum mempercayai atau menyebarkan.'}
+]},
+praktik: {name:'Praktik Hidup Sehat', short:'Praktik Hidup Sehat', icon:'🌱', q:[
+{q:'Praktik hidup sehat sebaiknya diterapkan...', c:'Setiap hari secara konsisten', w:['Hanya saat sakit', 'Sesekali saja', 'Hanya saat ada lomba kesehatan'], e:'Hidup sehat adalah kebiasaan yang perlu diterapkan secara konsisten setiap hari.'},
+{q:'Contoh penerapan pola makan sehat sehari-hari adalah...', c:'Memperbanyak sayur dan buah serta membatasi gorengan', w:['Sering makan makanan cepat saji', 'Melewatkan sarapan setiap hari', 'Banyak minum minuman manis'], e:'Pola makan sehat menekankan sayur, buah, dan membatasi makanan tinggi gula, garam, dan lemak.'},
+{q:'Kebiasaan sehat sebelum tidur adalah...', c:'Menyikat gigi dan mengurangi penggunaan gawai', w:['Makan berat', 'Bermain gawai hingga larut', 'Minum kopi'], e:'Menyikat gigi dan membatasi gawai sebelum tidur mendukung kesehatan dan kualitas tidur.'},
+{q:'Membuat jadwal harian yang seimbang membantu...', c:'Menyeimbangkan waktu belajar, aktivitas fisik, dan istirahat', w:['Menghabiskan waktu untuk satu kegiatan', 'Mengabaikan istirahat', 'Menunda semua tugas'], e:'Jadwal seimbang membantu membagi waktu untuk belajar, gerak, dan istirahat secara sehat.'},
+{q:'Salah satu bentuk aktivitas fisik yang mudah dilakukan setiap hari adalah...', c:'Berjalan kaki dan naik tangga', w:['Selalu naik lift', 'Duduk sepanjang hari', 'Menghindari gerakan'], e:'Berjalan kaki dan naik tangga adalah aktivitas fisik sederhana yang bisa dilakukan sehari-hari.'},
+{q:'Menjaga kebersihan diri sebagai praktik hidup sehat meliputi...', c:'Mandi, cuci tangan, dan menyikat gigi secara teratur', w:['Mandi sebulan sekali', 'Jarang mencuci tangan', 'Membiarkan kuku panjang dan kotor'], e:'Kebersihan diri seperti mandi, cuci tangan, dan sikat gigi teratur adalah dasar hidup sehat.'},
+{q:'Membiasakan minum air putih yang cukup bertujuan untuk...', c:'Menjaga tubuh tetap terhidrasi', w:['Menambah kadar gula', 'Menggantikan makan', 'Membuat cepat lelah'], e:'Air putih yang cukup menjaga tubuh terhidrasi dan mendukung fungsi organ.'},
+{q:'Salah satu cara mengelola stres dalam kehidupan sehari-hari adalah...', c:'Melakukan hobi dan berbagi cerita dengan orang tepercaya', w:['Memendam masalah sendiri', 'Begadang terus-menerus', 'Menghindari semua orang'], e:'Menyalurkan stres melalui hobi dan berbagi cerita adalah bagian dari praktik hidup sehat.'},
+{q:'Untuk membangun kebiasaan sehat, sebaiknya dimulai dengan...', c:'Langkah kecil yang dilakukan secara konsisten', w:['Perubahan besar sekaligus lalu berhenti', 'Menunggu waktu yang sempurna', 'Meniru orang lain tanpa menyesuaikan'], e:'Kebiasaan sehat lebih mudah terbentuk jika dimulai dari langkah kecil yang konsisten.'},
+{q:'Menghindari rokok dan asapnya termasuk praktik hidup sehat karena...', c:'Melindungi paru-paru dan mencegah berbagai penyakit', w:['Membuat tubuh lebih kuat', 'Menambah stamina', 'Meningkatkan konsentrasi'], e:'Menjauhi rokok dan asapnya melindungi paru-paru dan mencegah penyakit pernapasan serta jantung.'},
+{q:'Sarapan sehat sebelum beraktivitas berperan untuk...', c:'Memberi energi dan menjaga konsentrasi', w:['Membuat tubuh lemas', 'Menaikkan berat badan berlebih', 'Menghambat aktivitas'], e:'Sarapan sehat menyediakan energi dan membantu konsentrasi sepanjang aktivitas.'},
+{q:'Contoh memanfaatkan waktu luang secara sehat adalah...', c:'Berolahraga atau melakukan hobi yang bermanfaat', w:['Bermain gawai berjam-jam tanpa henti', 'Begadang tanpa tujuan', 'Makan camilan tidak sehat terus-menerus'], e:'Mengisi waktu luang dengan olahraga atau hobi positif mendukung kesehatan fisik dan mental.'},
+{q:'Salah satu praktik menjaga kesehatan lingkungan di rumah adalah...', c:'Membuang sampah pada tempatnya dan menjaga kebersihan', w:['Membiarkan sampah menumpuk', 'Membiarkan genangan air', 'Mengabaikan kebersihan'], e:'Menjaga kebersihan lingkungan rumah mendukung kesehatan seluruh anggota keluarga.'},
+{q:'Kebiasaan memeriksa kesehatan secara berkala bertujuan untuk...', c:'Mendeteksi masalah kesehatan sejak dini', w:['Menghabiskan biaya percuma', 'Membuat cemas berlebihan', 'Menunggu sampai sakit parah'], e:'Pemeriksaan berkala membantu mendeteksi dan menangani masalah kesehatan lebih dini.'},
+{q:'Menyeimbangkan waktu layar (screen time) dengan aktivitas lain penting karena...', c:'Terlalu lama menatap layar dapat mengganggu kesehatan mata dan tidur', w:['Layar tidak berpengaruh apa pun', 'Semakin lama semakin sehat', 'Membuat tubuh lebih bugar'], e:'Membatasi waktu layar menjaga kesehatan mata, postur, dan kualitas tidur.'},
+{q:'Praktik hidup sehat di sekolah dapat berupa...', c:'Jajan sehat dan aktif bergerak saat istirahat', w:['Jajan sembarangan', 'Duduk terus sepanjang hari', 'Melewatkan waktu makan'], e:'Memilih jajanan sehat dan aktif bergerak adalah praktik hidup sehat di lingkungan sekolah.'},
+{q:'Membiasakan tidur dan bangun pada jam yang teratur bermanfaat untuk...', c:'Menjaga ritme tubuh dan kualitas istirahat', w:['Membuat tubuh lelah', 'Mengganggu kesehatan', 'Menurunkan konsentrasi'], e:'Jam tidur yang teratur menjaga ritme biologis tubuh dan kualitas istirahat.'},
+{q:'Cara sehat menikmati makanan manis adalah...', c:'Membatasi jumlahnya dan tidak berlebihan', w:['Mengonsumsi sebanyak-banyaknya', 'Menjadikannya makanan pokok', 'Menggantikan air putih dengan minuman manis'], e:'Makanan manis boleh dinikmati sesekali dengan jumlah terbatas agar tidak berlebihan.'},
+{q:'Mengajak keluarga menerapkan hidup sehat dapat dilakukan dengan...', c:'Berolahraga bersama dan menyiapkan makanan sehat', w:['Membiarkan masing-masing', 'Menyediakan makanan tidak sehat', 'Melarang aktivitas fisik'], e:'Melibatkan keluarga dalam olahraga dan makanan sehat memperkuat kebiasaan hidup sehat bersama.'},
+{q:'Salah satu manfaat konsisten menerapkan hidup sehat adalah...', c:'Tubuh lebih bugar dan risiko penyakit menurun', w:['Mudah sakit', 'Cepat lelah', 'Daya tahan menurun'], e:'Hidup sehat yang konsisten membuat tubuh lebih bugar dan menurunkan risiko penyakit.'},
+{q:'Ketika gagal menjalankan kebiasaan sehat pada suatu hari, sikap yang tepat adalah...', c:'Tidak menyerah dan mencoba lagi keesokan harinya', w:['Berhenti sepenuhnya', 'Menyalahkan diri terus-menerus', 'Menganggap semua sia-sia'], e:'Konsistensi dibangun dengan tidak menyerah dan terus mencoba meski sesekali gagal.'},
+{q:'Membawa bekal sehat dari rumah membantu...', c:'Mengontrol kebersihan dan kandungan gizi makanan', w:['Menambah konsumsi makanan tidak sehat', 'Mengurangi kualitas makanan', 'Membuang waktu tanpa manfaat'], e:'Bekal dari rumah memudahkan kita mengontrol kebersihan dan gizi makanan yang dikonsumsi.'},
+{q:'Contoh perilaku hidup sehat saat berada di tempat umum adalah...', c:'Menerapkan etika batuk dan menjaga kebersihan tangan', w:['Batuk tanpa menutup mulut', 'Membuang sampah sembarangan', 'Meludah sembarangan'], e:'Etika batuk dan kebersihan tangan di tempat umum mencegah penularan penyakit.'},
+{q:'Menjaga postur tubuh yang baik saat duduk dan belajar bertujuan untuk...', c:'Mencegah nyeri punggung dan gangguan tulang belakang', w:['Membuat cepat lelah', 'Mengganggu pernapasan', 'Menurunkan konsentrasi'], e:'Postur duduk yang baik mencegah nyeri punggung dan masalah tulang belakang.'},
+{q:'Salah satu praktik menjaga kesehatan mata adalah...', c:'Mengistirahatkan mata secara berkala saat menatap layar', w:['Menatap layar tanpa henti', 'Membaca di tempat gelap', 'Mengucek mata dengan tangan kotor'], e:'Mengistirahatkan mata secara berkala menjaga kesehatan mata saat menggunakan gawai.'},
+{q:'Kebiasaan mencuci tangan sebelum makan termasuk praktik hidup sehat karena...', c:'Mencegah masuknya kuman ke dalam tubuh', w:['Membuat tangan wangi saja', 'Tidak ada gunanya', 'Menggantikan mandi'], e:'Mencuci tangan sebelum makan mencegah kuman masuk ke tubuh melalui makanan.'},
+{q:'Menyisihkan waktu untuk relaksasi dan istirahat bertujuan untuk...', c:'Menjaga keseimbangan kesehatan fisik dan mental', w:['Membuang-buang waktu', 'Menambah beban pikiran', 'Menurunkan produktivitas selamanya'], e:'Relaksasi dan istirahat yang cukup menjaga keseimbangan kesehatan fisik dan mental.'},
+{q:'Membatasi konsumsi makanan tinggi garam bertujuan untuk...', c:'Mencegah tekanan darah tinggi', w:['Menambah nafsu makan berlebih', 'Membuat tulang kuat', 'Menghindari rasa haus'], e:'Membatasi garam membantu mencegah tekanan darah tinggi atau hipertensi.'},
+{q:'Menyediakan buah sebagai camilan di rumah adalah contoh praktik hidup sehat karena...', c:'Mendorong kebiasaan memilih camilan yang bergizi', w:['Menggantikan seluruh makan utama', 'Membuat tubuh cepat lelah', 'Menambah konsumsi gula olahan'], e:'Menyediakan buah sebagai camilan mendorong pilihan camilan bergizi dibanding makanan tinggi gula dan lemak.'},
+{q:'Kesimpulan tentang praktik hidup sehat yang tepat adalah...', c:'Hidup sehat adalah kebiasaan sehari-hari yang dibangun secara konsisten dan seimbang', w:['Cukup dilakukan saat sakit', 'Hanya soal olahraga berat', 'Tidak perlu konsisten'], e:'Praktik hidup sehat adalah kebiasaan sehari-hari yang dibangun konsisten dan seimbang antara makan, gerak, istirahat, kebersihan, dan mental.'}
+]},
+};
+
+// ---------- App logic ----------
+const QN = 10; // soal per sesi
+const topicKeys = Object.keys(BANK);
+const el = id => document.getElementById(id);
+const screens = {home: el('home'), quiz: el('quiz'), result: el('result')};
+function show(name){for(const k in screens){screens[k].classList.toggle('hidden', k!==name);} window.scrollTo(0,0);}
+
+function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+function hsKey(key){return 'litkes_hs_'+key;}
+function getHS(key){const v=parseInt(localStorage.getItem(hsKey(key)),10);return isNaN(v)?null:v;}
+function setHS(key,val){try{localStorage.setItem(hsKey(key), String(val));}catch(e){}}
+
+// Build home topic grid
+const CARD_GRAD={
+  pengantar:'linear-gradient(135deg,#0EA5B7,#12B981)',
+  phbs:'linear-gradient(135deg,#06B6D4,#0EA5B7)',
+  gizi:'linear-gradient(135deg,#14B8A6,#10B981)',
+  aktivitas:'linear-gradient(135deg,#0EA5B7,#22C55E)',
+  pencegahan:'linear-gradient(135deg,#0891B2,#0D9488)',
+  mental:'linear-gradient(135deg,#10B981,#34D399)',
+  informasi:'linear-gradient(135deg,#0E9AAF,#14B8A6)',
+  praktik:'linear-gradient(135deg,#12B981,#4ADE80)'
+};
+const CARD_ILLUS={
+  pengantar:'<g fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M60 30C53 25 44 25 38 27v28c6-2 15-2 22 3 7-5 16-5 22-3V27c-6-2-15-2-22 3z"/><path d="M60 30v28"/></g>',
+  phbs:'<g fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M60 24c7 10 13 18 13 26a13 13 0 0 1-26 0c0-8 6-16 13-26z"/></g><circle cx="86" cy="30" r="4" fill="#fff" opacity=".85"/><circle cx="34" cy="42" r="3" fill="#fff" opacity=".7"/>',
+  gizi:'<g fill="none" stroke="#fff" stroke-width="4"><circle cx="60" cy="42" r="19"/><path d="M60 23v38M41 42h38" stroke-width="3" opacity=".85"/></g>',
+  aktivitas:'<g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><line x1="44" y1="42" x2="76" y2="42"/><line x1="40" y1="33" x2="40" y2="51"/><line x1="80" y1="33" x2="80" y2="51"/><line x1="33" y1="37" x2="33" y2="47"/><line x1="87" y1="37" x2="87" y2="47"/></g>',
+  pencegahan:'<g fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M60 22l18 7v13c0 12-8 19-18 22-10-3-18-10-18-22V29z"/><path d="M60 36v16M52 44h16"/></g>',
+  mental:'<circle cx="60" cy="39" r="19" fill="none" stroke="#fff" stroke-width="4"/><path d="M60 50c-6-4-10-8-10-13 0-3 2-5 5-5 2 0 4 1 5 3 1-2 3-3 5-3 3 0 5 2 5 5 0 5-4 9-10 13z" fill="#fff"/>',
+  informasi:'<g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><circle cx="55" cy="38" r="14"/><line x1="65" y1="48" x2="78" y2="61"/></g><line x1="49" y1="34" x2="61" y2="34" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".9"/><line x1="49" y1="41" x2="57" y2="41" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".9"/>',
+  praktik:'<g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M60 63V40"/><path d="M60 46c0-8-6-15-17-15 0 8 6 15 17 15z"/><path d="M60 42c0-7 6-13 16-13 0 7-6 13-16 13z"/></g>'
+};
+function tIllus(key,num){
+  return '<div class="t-illus" style="background-image:'+(CARD_GRAD[key]||'linear-gradient(135deg,#0EA5B7,#12B981)')+'">'+
+    '<svg class="t-svg" viewBox="0 0 120 84" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
+    '<circle cx="100" cy="14" r="24" fill="#fff" opacity=".12"/><circle cx="16" cy="72" r="16" fill="#fff" opacity=".10"/>'+
+    (CARD_ILLUS[key]||'')+'</svg>'+
+    '<span class="t-num">Topik '+num+'</span></div>';
+}
+function renderHome(){
+  const grid=el('topicGrid');
+  grid.innerHTML='';
+  // Campuran (opsi soal acak) ditampilkan di bagian atas
+  const mixHS=getHS('__mix__');
+  const mix=document.createElement('button');
+  mix.className='topic mix';
+  mix.setAttribute('aria-label','Mulai kuis mode Campuran');
+  mix.innerHTML='<span class="t-ico">🎲</span>'+
+    '<span><span class="t-name">Mode Campuran</span>'+
+    '<span class="t-meta">10 soal acak dari semua topik'+(mixHS!=null?' · <span class="hs">★ '+mixHS+'/10</span>':'')+'</span></span>';
+  mix.addEventListener('click',()=>startQuiz('__mix__'));
+  grid.appendChild(mix);
+  topicKeys.forEach((key,idx)=>{
+    const t=BANK[key];
+    const hs=getHS(key);
+    const btn=document.createElement('button');
+    btn.className='topic';
+    btn.setAttribute('aria-label','Mulai kuis '+t.name);
+    btn.innerHTML=tIllus(key,idx+1)+
+      '<div class="t-body">'+
+      '<span class="t-name">'+t.name+'</span>'+
+      '<span class="t-meta">'+QN+' soal'+(hs!=null?' · <span class="hs">★ Skor tertinggi '+hs+'/10</span>':'')+'</span>'+
+      '</div>';
+    btn.addEventListener('click',()=>startQuiz(key));
+    grid.appendChild(btn);
+  });
+}
+
+let S=null; // sesi aktif
+
+function buildPool(key){
+  if(key==='__mix__'){
+    let all=[];
+    topicKeys.forEach(k=>{BANK[k].q.forEach(it=>all.push(Object.assign({}, it, {src:BANK[k].name})));});
+    return all;
+  }
+  return BANK[key].q.map(it=>Object.assign({}, it, {src:BANK[key].name}));
+}
+
+function prep(item){
+  const opts=shuffle([{t:item.c,ok:true}].concat(item.w.map(w=>({t:w,ok:false}))));
+  return {q:item.q, e:item.e, src:item.src, opts:opts};
+}
+
+function startQuiz(key){
+  const pool=buildPool(key);
+  const picked=shuffle(pool).slice(0, Math.min(QN, pool.length));
+  S={key:key, questions:picked.map(prep), idx:0, score:0, answered:false};
+  show('quiz');
+  renderQuestion();
+}
+
+const LETTERS=['A','B','C','D'];
+
+function renderQuestion(){
+  S.answered=false;
+  const q=S.questions[S.idx];
+  el('qNum').textContent=(S.idx+1);
+  el('qScore').textContent=S.score;
+  el('pfill').style.width=((S.idx)/S.questions.length*100)+'%';
+  el('qSrc').querySelector('span').textContent=q.src;
+  el('qText').textContent=q.q;
+  const box=el('optBox');
+  box.innerHTML='';
+  q.opts.forEach((opt,i)=>{
+    const b=document.createElement('button');
+    b.className='opt';
+    b.innerHTML='<span class="lt">'+LETTERS[i]+'</span><span class="ot">'+opt.t+'</span>';
+    b.addEventListener('click',()=>answer(i,b));
+    box.appendChild(b);
+  });
+  const fb=el('fbBox');
+  fb.className='fb hidden';
+  fb.innerHTML='';
+  const nb=el('nextBtn');
+  nb.disabled=true;
+  nb.textContent=(S.idx===S.questions.length-1)?'Lihat hasil':'Lanjut';
+}
+
+function answer(i, btn){
+  if(S.answered) return;
+  S.answered=true;
+  const q=S.questions[S.idx];
+  const chosen=q.opts[i];
+  const buttons=el('optBox').querySelectorAll('.opt');
+  buttons.forEach((b,idx)=>{
+    b.disabled=true;
+    if(q.opts[idx].ok){b.classList.add('correct');}
+    else if(idx===i){b.classList.add('wrong');}
+    else{b.classList.add('dim');}
+  });
+  if(chosen.ok) S.score++;
+  el('qScore').textContent=S.score;
+  const correctText=q.opts.find(o=>o.ok).t;
+  const fb=el('fbBox');
+  fb.className='fb '+(chosen.ok?'ok':'no');
+  fb.innerHTML='<div class="fb-h">'+(chosen.ok?'✔ Benar':'✖ Kurang tepat')+'</div>'+
+    (chosen.ok?'':'<div class="exp" style="margin-bottom:6px"><b>Jawaban benar:</b> '+correctText+'</div>')+
+    '<div class="exp">'+q.e+'</div>';
+  el('nextBtn').disabled=false;
+  el('nextBtn').focus();
+}
+
+el('nextBtn').addEventListener('click',()=>{
+  if(!S.answered) return;
+  if(S.idx < S.questions.length-1){S.idx++; renderQuestion();}
+  else{finish();}
+});
+
+el('quitBtn').addEventListener('click',()=>{renderHome(); show('home');});
+el('homeBtn').addEventListener('click',()=>{renderHome(); show('home');});
+el('againBtn').addEventListener('click',()=>{startQuiz(S.key);});
+
+function finish(){
+  const total=S.questions.length;
+  const score=S.score;
+  const prevHS=getHS(S.key);
+  const isNew = prevHS==null || score>prevHS;
+  if(isNew) setHS(S.key, score);
+  const bestNow=getHS(S.key);
+  el('pfill').style.width='100%';
+  const label=(S.key==='__mix__')?'Mode Campuran':BANK[S.key].name;
+  el('rSrc').querySelector('span').textContent=label;
+  el('rScore').textContent=score;
+  // ring
+  const C=414.7;
+  el('ringFill').style.strokeDashoffset=String(C*(1-score/total));
+  let verdict, color;
+  const pct=score/total;
+  if(pct>=0.9){verdict='Luar biasa! 🎉'; color='var(--green)';}
+  else if(pct>=0.7){verdict='Bagus sekali! 👍'; color='var(--green)';}
+  else if(pct>=0.5){verdict='Cukup baik, terus berlatih 💪'; color='var(--blue)';}
+  else{verdict='Ayo pelajari lagi materinya 📚'; color='var(--orange)';}
+  el('ringFill').style.stroke=color;
+  el('rVerdict').textContent=verdict;
+  el('rMeta').innerHTML='Kamu menjawab benar <b>'+score+'</b> dari <b>'+total+'</b> soal.'+
+    (isNew?'<br><span class="newhs">★ Skor tertinggi baru!</span>':'<br>Skor tertinggi kamu: <b>'+bestNow+'/'+total+'</b>');
+  show('result');
+}
+
+// init
+renderHome();
+show('home');
+</script>
+</body>
+</html>
